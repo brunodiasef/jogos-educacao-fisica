@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jogos - Classificação dos Esportes</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#123524">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jogos EF">
 <style>
   :root{
     --quadra: #123524;
@@ -124,6 +131,10 @@
   .crachá-aluno b{ color: var(--dourado); }
 
   /* ---------- MENU DE JOGOS ---------- */
+  .titulo-jogo-entrada{
+    font-size: clamp(22px, 5vw, 32px); margin: 0 0 16px; text-align:center;
+    font-family: var(--fonte-corpo);
+  }
   .instrucao{ font-size: 15px; opacity: 0.85; margin-bottom: 18px; text-align:center; }
 
   .grid-menu{
@@ -151,6 +162,17 @@
   .jogo-card .emoji{ font-size: 40px; display:block; margin-bottom: 10px; }
   .jogo-card .jogo-nome{ font-weight:800; font-size: 17px; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
   .jogo-card .jogo-desc{ font-size: 12.5px; opacity:0.92; line-height:1.4; }
+
+  .faixa-esportes-menu{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap: 22px; width:100%; max-width: 920px; margin: 30px auto 0;
+    opacity: 0.16; pointer-events:none; user-select:none;
+  }
+  .faixa-esportes-menu svg{ width: 42px; height: 42px; flex-shrink:0; filter: invert(1) grayscale(1) brightness(1.8); }
+  @media (max-width: 600px){
+    .faixa-esportes-menu svg{ width: 32px; height: 32px; }
+    .faixa-esportes-menu{ gap: 14px; }
+  }
 
   /* ---------- TELA INICIAL (categorias jogo da memória) ---------- */
   .grid-categorias{
@@ -673,10 +695,12 @@
         <div class="jogo-desc">Jogue o dado, responda perguntas e corra até a linha de chegada.</div>
       </button>
     </div>
+    <div class="faixa-esportes-menu" id="faixa-esportes-menu"></div>
   </section>
 
   <!-- ===================== JOGO 1: MEMÓRIA ===================== -->
   <section id="tela-inicial" class="escondido">
+    <h1 class="titulo-jogo-entrada">🧠 Jogo da Memória</h1>
     <div class="barra-jogo" style="max-width:720px;">
       <div></div>
       <button class="btn secundario" id="btn-voltar-menu-1">Voltar ao menu</button>
@@ -710,8 +734,9 @@
 
   <!-- ===================== JOGO 2: CLASSIFICANDO OS ESPORTES ===================== -->
   <section id="tela-classificar" class="escondido">
+    <h1 class="titulo-jogo-entrada">🗂️ Classificando os Esportes</h1>
     <div class="barra-jogo">
-      <div class="cat-titulo">Classificando os Esportes</div>
+      <div></div>
       <div class="placar">
         <span>Acertos: <b id="contador-acertos-classificar">0</b>/20</span>
       </div>
@@ -745,6 +770,7 @@
 
   <!-- ===================== JOGO 3: ACERTE A PERGUNTA (QUIZ) ===================== -->
   <section id="tela-quiz-categorias" class="escondido">
+    <h1 class="titulo-jogo-entrada">❓ Acerte a Pergunta</h1>
     <div class="barra-jogo" style="max-width:720px;">
       <div></div>
       <button class="btn secundario" id="btn-voltar-menu-3-categorias">Voltar ao menu</button>
@@ -779,8 +805,9 @@
 
   <!-- ===================== JOGO 4: PALAVRAS CRUZADAS ===================== -->
   <section id="tela-cruzadas" class="escondido">
+    <h1 class="titulo-jogo-entrada">📝 Palavras Cruzadas</h1>
     <div class="barra-jogo">
-      <div class="cat-titulo">Palavras Cruzadas<small>15 esportes do jogo</small></div>
+      <div></div>
       <div class="placar"><span>Acertos: <b id="contador-acertos-cruzadas">0</b>/15</span></div>
       <div class="btns-topo">
         <button class="btn secundario" id="btn-verificar-cruzadas">Verificar</button>
@@ -814,8 +841,9 @@
 
   <!-- ===================== JOGO 5: CAÇA-PALAVRAS ===================== -->
   <section id="tela-caca" class="escondido">
+    <h1 class="titulo-jogo-entrada">🔍 Caça-Palavras</h1>
     <div class="barra-jogo">
-      <div class="cat-titulo">Caça-Palavras<small>15 palavras escondidas</small></div>
+      <div></div>
       <div class="placar"><span>Encontradas: <b id="contador-encontradas-caca">0</b>/15</span></div>
       <button class="btn secundario" id="btn-voltar-menu-5">Voltar ao menu</button>
     </div>
@@ -838,7 +866,11 @@
   <!-- ===================== JOGO 6: CORRIDA DOS CAMPEÕES ===================== -->
   <section id="tela-corrida-intro" class="escondido">
     <div class="intro-corrida">
-      <h1 style="font-size: clamp(22px,5vw,32px); margin:0;">🏁 Corrida dos Campeões</h1>
+      <h1 class="titulo-jogo-entrada">🏁 Corrida dos Campeões</h1>
+      <div class="barra-jogo" style="max-width:720px;">
+        <div></div>
+        <button class="btn secundario" id="btn-voltar-menu-6-intro">Voltar ao menu</button>
+      </div>
       <div class="ilustracao-pista-intro">
         <span class="bandeira-intro">🏳️</span>
         <span class="trofeu-intro">🏆</span>
@@ -847,12 +879,15 @@
       </div>
       <p class="instrucao">Escolha uma categoria para iniciar a corrida:</p>
       <div class="grid-categorias" id="grid-categorias-corrida"></div>
-      <button class="btn secundario" id="btn-voltar-menu-6-intro">Voltar ao menu</button>
     </div>
   </section>
 
   <section id="tela-corrida-jogo" class="escondido">
     <div class="area-corrida">
+      <div class="btns-topo" style="width:100%; justify-content:flex-end;">
+        <button class="btn-som-efeitos" id="btn-som-efeitos-corrida">🔊 Efeitos</button>
+        <button class="btn secundario" id="btn-voltar-menu-6">Voltar</button>
+      </div>
       <div class="painel-corrida">
         <div class="painel-item">🏁 Categoria<b id="painel-categoria-corrida">-</b></div>
         <div class="painel-item">📍 Sua casa<b id="painel-casa-corrida">1</b>/30</div>
@@ -861,10 +896,6 @@
         <div class="painel-item">✅ Acertos<b id="painel-acertos-corrida">0</b></div>
         <div class="painel-item">❌ Erros<b id="painel-erros-corrida">0</b></div>
         <div class="painel-item">📊 Aproveitamento<b id="painel-aproveitamento-corrida">0%</b></div>
-      </div>
-      <div class="btns-topo">
-        <button class="btn-som-efeitos" id="btn-som-efeitos-corrida">🔊 Efeitos</button>
-        <button class="btn secundario" id="btn-voltar-menu-6">Voltar ao menu</button>
       </div>
       <div class="turno-corrida" id="turno-corrida">Sua vez! 🎲</div>
       <div class="legenda-jogadores">
@@ -1044,6 +1075,18 @@
     badminton: `<svg viewBox="0 0 100 100"><circle cx="35" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M35 26 L40 54 M40 30 L58 14 M40 32 L24 44 M40 54 L30 84 M40 54 L54 80" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><ellipse cx="64" cy="10" rx="8" ry="10" fill="none" stroke="${COR_FIGURA}" stroke-width="3" transform="rotate(15 64 10)"/><path d="M80 40 L86 30 L92 40 Z" fill="${COR_FIGURA}"/><line x1="86" y1="40" x2="86" y2="48" stroke="${COR_FIGURA}" stroke-width="3"/><line x1="0" y1="70" x2="100" y2="70" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/></svg>`,
     tenis_mesa: `<svg viewBox="0 0 100 100"><rect x="10" y="40" width="80" height="34" rx="3" fill="none" stroke="${COR_FIGURA}" stroke-width="5"/><line x1="50" y1="34" x2="50" y2="80" stroke="${COR_FIGURA}" stroke-width="4"/><circle cx="30" cy="57" r="5" fill="${COR_FIGURA}"/><ellipse cx="76" cy="20" rx="10" ry="7" fill="none" stroke="${COR_FIGURA}" stroke-width="4" transform="rotate(-20 76 20)"/><line x1="82" y1="24" x2="90" y2="34" stroke="${COR_FIGURA}" stroke-width="4" stroke-linecap="round"/></svg>`
   };
+
+  // Faixa decorativa: ícones de esportes aleatórios, bem transparentes, abaixo dos cards do menu
+  (function popularFaixaEsportesMenu(){
+    const container = document.getElementById('faixa-esportes-menu');
+    if(!container) return;
+    const todosIcones = Object.values(ICONES);
+    const embaralhados = todosIcones
+      .map(icone => ({ icone, ordem: Math.random() }))
+      .sort((a, b) => a.ordem - b.ordem)
+      .map(item => item.icone);
+    container.innerHTML = embaralhados.join('');
+  })();
 
   const CATEGORY_INFO = {
     marca: { nome: "Esportes de Marca", cor: "marca", corHex: "#8f2323" },
@@ -2620,6 +2663,15 @@
   });
 
 })();
+
+// Registro do Service Worker (PWA) - permite instalar o jogo como app e usar offline
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {
+      // Se falhar (ex.: aberto localmente sem servidor), o jogo continua funcionando normalmente
+    });
+  });
+}
 </script>
 
 </body>
