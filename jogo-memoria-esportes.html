@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogos - Classificação dos Esportes</title>
+<style>
+  :root{
+    --quadra: #123524;
+    --quadra-escura: #0b2318;
+    --giz: #f4efe1;
+    --dourado: #f2a93b;
+    --linha: rgba(244,239,225,0.18);
+
+    --cor-marca: #d64545;
+    --cor-marca-esc: #8f2323;
+    --cor-invasao: #2f6fed;
+    --cor-invasao-esc: #17408f;
+    --cor-precisao: #7d3fd1;
+    --cor-precisao-esc: #4a1f8f;
+    --cor-combinatorio: #e08a1f;
+    --cor-combinatorio-esc: #9c5a0d;
+    --cor-rede: #2fa84f;
+    --cor-rede-esc: #1a6b30;
+
+    --cor-jogo1: #f2a93b; --cor-jogo1-esc: #9c6c1c;
+    --cor-jogo2: #1fa08f; --cor-jogo2-esc: #0f5d52;
+    --cor-jogo3: #7d3fd1; --cor-jogo3-esc: #4a1f8f;
+    --cor-jogo4: #d1417d; --cor-jogo4-esc: #8f1f52;
+    --cor-jogo5: #2f8fd1; --cor-jogo5-esc: #17547f;
+    --cor-jogo6: #ff6b35; --cor-jogo6-esc: #b8431a;
+
+    --fonte-titulo: 'Arial Black', 'Segoe UI Black', sans-serif;
+    --fonte-corpo: 'Segoe UI', Verdana, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 60%),
+      repeating-linear-gradient(0deg, var(--quadra) 0 90px, var(--quadra-escura) 90px 92px),
+      var(--quadra);
+    color: var(--giz);
+    font-family: var(--fonte-corpo);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 24px 16px 12px;
+  }
+
+  .central-line{
+    position:fixed; top:0; bottom:0; left:50%; width:2px;
+    background: var(--linha); transform: translateX(-50%);
+    pointer-events:none; z-index:0;
+  }
+  .central-circle{
+    position:fixed; top:50%; left:50%; width:260px; height:260px;
+    border:2px solid var(--linha); border-radius:50%;
+    transform:translate(-50%,-50%); pointer-events:none; z-index:0;
+  }
+
+  .app{
+    position:relative; z-index:1; width:100%; max-width:920px;
+    display:flex; flex-direction:column; align-items:center; flex:1;
+  }
+
+  /* ---------- CABEÇALHO / TÍTULO ---------- */
+  header.titulo{ text-align:center; margin-bottom: 18px; }
+  .escola{
+    font-size: clamp(13px, 2.4vw, 17px); letter-spacing: 1px;
+    color: var(--dourado); font-weight:700; text-transform:uppercase; margin-bottom: 6px;
+  }
+  h1{
+    font-family: var(--fonte-titulo); font-size: clamp(28px, 6vw, 46px);
+    letter-spacing: 1px; margin: 0; line-height:1.05; color: var(--giz);
+    text-shadow: 0 3px 0 var(--quadra-escura);
+  }
+  h1 .destaque{ color: var(--dourado); }
+
+  .faixa-conteudo{
+    margin-top: 14px; display:inline-flex; align-items:center; gap:10px;
+    background: linear-gradient(135deg, var(--dourado), #d68a1a);
+    color: var(--quadra-escura); padding: 10px 26px; border-radius: 999px;
+    box-shadow: 0 6px 0 #9c6c1c, 0 10px 20px rgba(0,0,0,0.35);
+    border: 2px solid rgba(255,255,255,0.35);
+  }
+  .faixa-conteudo .bola{ font-size: 20px; line-height:1; }
+  .faixa-conteudo span.texto{
+    font-family: var(--fonte-titulo); font-size: clamp(18px, 4.2vw, 30px);
+    letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+  }
+  @media (max-width: 460px){
+    .faixa-conteudo{ padding: 8px 16px; }
+    .faixa-conteudo span.texto{ white-space: normal; text-align:center; }
+  }
+
+  /* ---------- TELA DE IDENTIFICAÇÃO ---------- */
+  .cartao-identificacao{
+    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    padding: 28px 26px; max-width: 420px; width:100%; text-align:center;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  }
+  .cartao-identificacao h2{ font-family: var(--fonte-titulo); font-size: clamp(18px, 4vw, 24px); margin: 0 0 6px; color: var(--dourado); }
+  .cartao-identificacao p{ margin: 0 0 20px; font-size: 14px; opacity:0.85; }
+  .campo{ text-align:left; margin-bottom: 16px; }
+  .campo label{ display:block; font-size:12.5px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado); font-weight:700; margin-bottom: 6px; }
+  .campo input{
+    width:100%; padding: 11px 14px; border-radius: 8px; border: 2px solid var(--linha);
+    background: rgba(244,239,225,0.08); color: var(--giz); font-size: 15px;
+    font-family: var(--fonte-corpo); outline:none;
+  }
+  .campo input::placeholder{ color: rgba(244,239,225,0.4); }
+  .campo input:focus{ border-color: var(--dourado); background: rgba(244,239,225,0.14); }
+  .erro-campo{ color:#ffb4b4; font-size:12.5px; margin-top:6px; min-height:14px; display:block; }
+
+  .crachá-aluno{
+    font-size: 13px; opacity:0.8; margin-bottom: 14px; text-align:center;
+    background: rgba(0,0,0,0.2); border: 1px solid var(--linha);
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .crachá-aluno b{ color: var(--dourado); }
+
+  /* ---------- MENU DE JOGOS ---------- */
+  .instrucao{ font-size: 15px; opacity: 0.85; margin-bottom: 18px; text-align:center; }
+
+  .grid-menu{
+    display:grid; grid-template-columns: repeat(6, minmax(150px, 1fr));
+    gap: 18px; width:100%; max-width: 1240px;
+  }
+  @media (max-width: 1250px){ .grid-menu{ grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 700px){ .grid-menu{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px){ .grid-menu{ grid-template-columns: 1fr; } }
+
+  .jogo-card{
+    position:relative; border:none; border-radius: 16px; padding: 26px 20px;
+    cursor:pointer; text-align:center; color: var(--giz); font-family: var(--fonte-corpo);
+    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.25), 0 8px 18px rgba(0,0,0,0.35);
+  }
+  .jogo-card:hover{ transform: translateY(-4px); }
+  .jogo-card:active{ transform: translateY(0px); }
+  .jogo-card.j1{ background: linear-gradient(135deg, var(--cor-jogo1), var(--cor-jogo1-esc)); }
+  .jogo-card.j2{ background: linear-gradient(135deg, var(--cor-jogo2), var(--cor-jogo2-esc)); }
+  .jogo-card.j3{ background: linear-gradient(135deg, var(--cor-jogo3), var(--cor-jogo3-esc)); }
+  .jogo-card.j4{ background: linear-gradient(135deg, var(--cor-jogo4), var(--cor-jogo4-esc)); }
+  .jogo-card.j5{ background: linear-gradient(135deg, var(--cor-jogo5), var(--cor-jogo5-esc)); }
+  .jogo-card.j6{ background: linear-gradient(135deg, var(--cor-jogo6), var(--cor-jogo6-esc)); }
+  .jogo-card .emoji{ font-size: 40px; display:block; margin-bottom: 10px; }
+  .jogo-card .jogo-nome{ font-weight:800; font-size: 17px; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
+  .jogo-card .jogo-desc{ font-size: 12.5px; opacity:0.92; line-height:1.4; }
+
+  /* ---------- TELA INICIAL (categorias jogo da memória) ---------- */
+  .grid-categorias{
+    display:grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 18px;
+    width:100%; max-width: 720px;
+  }
+  @media (max-width: 560px){ .grid-categorias{ grid-template-columns: 1fr; } }
+
+  .cat-card{
+    position:relative; border:none; border-radius: 14px; padding: 20px 18px;
+    cursor:pointer; text-align:left; color: var(--giz); font-family: var(--fonte-corpo);
+    overflow:hidden; transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.25), 0 8px 18px rgba(0,0,0,0.35);
+  }
+  .cat-card:hover{ transform: translateY(-4px); }
+  .cat-card:active{ transform: translateY(0px); box-shadow:0 2px 0 rgba(0,0,0,0.25); }
+
+  .cat-card.marca{ background: linear-gradient(135deg, var(--cor-marca), var(--cor-marca-esc)); }
+  .cat-card.invasao{ background: linear-gradient(135deg, var(--cor-invasao), var(--cor-invasao-esc)); }
+  .cat-card.precisao{ background: linear-gradient(135deg, var(--cor-precisao), var(--cor-precisao-esc)); }
+  .cat-card.combinatorio{ background: linear-gradient(135deg, var(--cor-combinatorio), var(--cor-combinatorio-esc)); }
+  .cat-card.rede{ background: linear-gradient(135deg, var(--cor-rede), var(--cor-rede-esc)); }
+
+  .cat-numero{ font-family: var(--fonte-titulo); font-size: 34px; opacity:0.35; position:absolute; top:6px; right:12px; }
+  .cat-nome{ font-weight:800; font-size: 18px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+  .cat-exemplos{ font-size:12.5px; opacity:0.9; }
+
+  /* ---------- BARRA DE JOGO GENÉRICA ---------- */
+  .barra-jogo{
+    width:100%; max-width: 720px; display:flex; justify-content:space-between;
+    align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 16px;
+  }
+  .barra-jogo .cat-titulo{ font-weight:800; text-transform:uppercase; font-size: clamp(14px,3vw,18px); letter-spacing:0.5px; }
+  .barra-jogo .cat-titulo small{ display:block; font-weight:400; text-transform:none; font-size:11.5px; opacity:0.75; letter-spacing:0; }
+  .placar{ display:flex; gap:14px; font-size:14px; font-variant-numeric: tabular-nums; }
+  .placar span b{ color: var(--dourado); }
+  .btns-topo{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  .btn{
+    background: var(--dourado); color: var(--quadra-escura); border:none;
+    padding:8px 16px; border-radius:8px; font-weight:800; cursor:pointer;
+    font-size:13px; text-transform:uppercase; letter-spacing:0.5px;
+    box-shadow: 0 4px 0 #9c6c1c; transition: transform .12s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn:active{ transform: translateY(1px); box-shadow:0 2px 0 #9c6c1c; }
+  .btn.secundario{ background: transparent; color: var(--giz); border: 2px solid var(--linha); box-shadow:none; }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none !important; }
+
+  /* ---------- TABULEIRO JOGO DA MEMÓRIA ---------- */
+  .tabuleiro{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    width:100%; max-width: 640px; perspective: 1000px;
+  }
+  @media (max-width: 480px){ .tabuleiro{ gap:7px; } }
+
+  .carta{ aspect-ratio: 3/4; position:relative; cursor:pointer; }
+  .carta-interior{
+    width:100%; height:100%; position:relative; transform-style:preserve-3d;
+    transition: transform 0.5s cubic-bezier(.2,.7,.3,1);
+  }
+  .carta.virada .carta-interior{ transform: rotateY(180deg); }
+  .carta.encontrada .carta-interior{ transform: rotateY(180deg); }
+
+  .face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:10px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:4px; text-align:center;
+  }
+  .verso{
+    background:
+      repeating-linear-gradient(45deg, rgba(244,239,225,0.06) 0 6px, transparent 6px 12px),
+      var(--card-cor, var(--quadra-escura));
+    border: 2px solid rgba(244,239,225,0.25);
+    box-shadow: inset 0 0 0 4px rgba(0,0,0,0.15);
+  }
+  .verso::after{ content: '?'; font-family: var(--fonte-titulo); font-size: clamp(20px, 5vw, 30px); color: rgba(244,239,225,0.6); }
+  .frente{ background: var(--giz); color: var(--quadra-escura); transform: rotateY(180deg); border: 2px solid rgba(0,0,0,0.1); }
+  .frente .icone{ width: 46%; max-width:56px; margin-bottom:4px; }
+  .frente .icone svg{ width:100%; height:auto; display:block; }
+  .frente .nome{ font-size: clamp(9px, 2.4vw, 12px); font-weight:800; text-transform:uppercase; letter-spacing:0.2px; }
+
+  .carta.encontrada .frente{ background: #e7f5e6; border-color: #4caf50; }
+  .carta.erro .verso{ animation: tremer 0.35s; }
+  @keyframes tremer{ 0%,100%{ transform: translateX(0); } 25%{ transform: translateX(-4px); } 75%{ transform: translateX(4px); } }
+
+  /* ---------- TELA DE VITÓRIA (genérica) ---------- */
+  .vitoria{ text-align:center; padding: 30px 20px; max-width:480px; }
+  .vitoria .troféu{ font-size:54px; margin-bottom:6px; }
+  .vitoria h2{ font-family: var(--fonte-titulo); color: var(--dourado); margin: 0 0 8px; font-size: clamp(22px, 5vw, 30px); }
+  .vitoria p{ opacity:0.9; margin: 4px 0 20px; }
+  .vitoria .btns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  .escondido{ display:none !important; }
+
+  /* ---------- JOGO 2: CLASSIFICANDO OS ESPORTES ---------- */
+  .area-classificar{
+    display:flex; gap:22px; flex-wrap:wrap; justify-content:center;
+    align-items:flex-start; width:100%; max-width: 780px;
+  }
+  .coluna-cartas{ flex:1 1 340px; max-width: 380px; }
+  .coluna-categorias{ flex:1 1 220px; max-width: 260px; display:flex; flex-direction:column; gap:12px; }
+
+  .tabuleiro-classificar{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .carta-pequena{ aspect-ratio: 3/4; }
+  .carta-pequena .frente .icone{ width:44%; max-width:34px; }
+  .carta-pequena .frente .nome{ font-size: 8px; }
+
+  .carta.selecionada .verso{ outline: 3px solid var(--dourado); outline-offset:-3px; }
+  .carta.classificada .carta-interior{ transform: rotateY(180deg); }
+  .carta.classificada .frente{ background:#e7f5e6; border-color:#4caf50; cursor:default; }
+  .carta.classificada{ cursor:default; }
+
+  .btn-categoria{
+    border:none; border-radius: 12px; padding: 16px 14px; cursor:pointer;
+    color: var(--giz); font-weight:800; text-transform:uppercase; letter-spacing:0.3px;
+    font-size: 13px; text-align:center; box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+    transition: transform .12s ease;
+  }
+  .btn-categoria:hover{ transform: translateY(-2px); }
+  .btn-categoria:active{ transform: translateY(1px); }
+  .btn-categoria.marca{ background: linear-gradient(135deg, var(--cor-marca), var(--cor-marca-esc)); }
+  .btn-categoria.invasao{ background: linear-gradient(135deg, var(--cor-invasao), var(--cor-invasao-esc)); }
+  .btn-categoria.precisao{ background: linear-gradient(135deg, var(--cor-precisao), var(--cor-precisao-esc)); }
+  .btn-categoria.combinatorio{ background: linear-gradient(135deg, var(--cor-combinatorio), var(--cor-combinatorio-esc)); }
+  .btn-categoria.rede{ background: linear-gradient(135deg, var(--cor-rede), var(--cor-rede-esc)); }
+
+  .aviso-classificar{ font-size:12.5px; text-align:center; min-height:18px; color: var(--dourado); opacity:0; transition:opacity .2s; }
+  .aviso-classificar.mostrar{ opacity:1; }
+
+  /* ---------- JOGO 3: ACERTE A PERGUNTA (QUIZ) ---------- */
+  .cartao-quiz{
+    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    padding: 26px 24px; max-width: 560px; width:100%;
+  }
+  .quiz-contador{ font-size:12.5px; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+  .quiz-pergunta{ font-family: var(--fonte-titulo); font-size: clamp(17px, 3.6vw, 22px); color: var(--dourado); margin-bottom: 20px; line-height:1.3; }
+  .quiz-opcoes{ display:flex; flex-direction:column; gap:12px; }
+  .opcao-quiz{
+    text-align:left; background: rgba(244,239,225,0.08); border: 2px solid var(--linha);
+    color: var(--giz); border-radius: 10px; padding: 14px 16px; cursor:pointer;
+    font-size: 13.5px; line-height:1.4; font-family: var(--fonte-corpo);
+    transition: transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  .opcao-quiz:hover:not(:disabled){ background: rgba(244,239,225,0.16); transform: translateX(3px); }
+  .opcao-quiz:disabled{ cursor:default; }
+  .opcao-quiz.correta{ background: rgba(76,175,80,0.25); border-color:#4caf50; }
+  .opcao-quiz.incorreta{ background: rgba(214,69,69,0.25); border-color:#d64545; }
+
+  /* ---------- JOGO 4: PALAVRAS CRUZADAS ---------- */
+  .area-cruzadas{
+    display:flex; flex-direction:column; align-items:center; gap: 22px;
+    width:100%; max-width: 900px;
+  }
+  .grade-cruzadas{
+    display:grid; gap: 2px; width:100%; max-width: 460px;
+    background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px;
+  }
+  .celula-cruzada, .celula-bloqueada{ aspect-ratio: 1 / 1; position:relative; }
+  .celula-bloqueada{ background: transparent; }
+  .celula-cruzada{ background: var(--giz); border-radius: 2px; }
+  .celula-cruzada input{
+    width:100%; height:100%; border:none; background:transparent; outline:none;
+    text-align:center; text-transform:uppercase; font-weight:800;
+    font-size: clamp(9px, 2.6vw, 15px); color: var(--quadra-escura); padding:0;
+    font-family: var(--fonte-corpo);
+  }
+  .numero-celula{
+    position:absolute; top:0px; left:1px; font-size: clamp(5px, 1.3vw, 7.5px);
+    color: var(--quadra-escura); opacity:0.65; pointer-events:none; line-height:1;
+  }
+  .celula-cruzada.ativa{ background: #ffe4a3; }
+  .celula-cruzada.correta{ background: #bfe6bd; }
+  .celula-cruzada.correta input{ color: #1a6b30; }
+  .celula-cruzada.incorreta input{ background: rgba(214,69,69,0.35); }
+
+  .colunas-dicas{ display:flex; gap: 30px; flex-wrap:wrap; justify-content:center; width:100%; max-width: 720px; }
+  .lista-dicas{ flex: 1 1 260px; min-width: 220px; }
+  .lista-dicas h3{
+    font-family: var(--fonte-titulo); font-size: 14px; color: var(--dourado);
+    text-transform:uppercase; letter-spacing:0.5px; margin: 0 0 10px;
+  }
+  .lista-dicas ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .item-dica{
+    font-size: 12.5px; line-height:1.4; cursor:pointer; padding: 7px 10px;
+    border-radius: 8px; border: 1px solid transparent; background: rgba(244,239,225,0.05);
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .item-dica:hover{ background: rgba(244,239,225,0.12); }
+  .item-dica.ativa{ background: rgba(242,169,59,0.18); border-color: var(--dourado); }
+  .item-dica.resolvida{ opacity:0.55; text-decoration: line-through; }
+  .item-dica b{ color: var(--dourado); margin-right:5px; }
+
+  /* ---------- JOGO 5: CAÇA-PALAVRAS ---------- */
+  .area-caca{
+    display:flex; flex-direction:column; align-items:center; gap: 22px;
+    width:100%; max-width: 700px;
+  }
+  .grade-caca{
+    display:grid; gap: 2px; width:100%; max-width: 460px;
+    background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .celula-caca{
+    aspect-ratio: 1 / 1; background: var(--giz); border-radius: 2px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size: clamp(9px, 2.6vw, 14px); color: var(--quadra-escura);
+    cursor:pointer;
+  }
+  .celula-caca.selecionando{ background: #ffe4a3; }
+  .celula-caca.encontrada{ background: #bfe6bd; color: #1a6b30; }
+
+  .lista-palavras-caca{
+    display:flex; flex-wrap:wrap; gap: 9px; justify-content:center; max-width: 620px;
+  }
+  .palavra-caca-item{
+    font-size: 12px; font-weight:800; padding: 6px 14px; border-radius: 999px;
+    background: rgba(244,239,225,0.08); border: 1px solid var(--linha);
+    text-transform:uppercase; letter-spacing:0.3px;
+  }
+  .palavra-caca-item.encontrada{
+    opacity:0.6; text-decoration: line-through;
+    background: rgba(76,175,80,0.2); border-color:#4caf50;
+  }
+
+  /* ---------- JOGO 6: CORRIDA DOS CAMPEÕES ---------- */
+  .intro-corrida{
+    display:flex; flex-direction:column; align-items:center; gap:18px;
+    width:100%; max-width: 560px; text-align:center;
+  }
+  .ilustracao-pista-intro{
+    width:100%; max-width: 420px; aspect-ratio: 16/9; border-radius: 16px;
+    background: linear-gradient(180deg, #2f8f4e 0%, #2f8f4e 18%, #c0392b 18%, #c0392b 82%, #2f8f4e 82%, #2f8f4e 100%);
+    position:relative; overflow:hidden; box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+    border: 3px solid rgba(244,239,225,0.3);
+  }
+  .ilustracao-pista-intro::before{
+    content:''; position:absolute; left:0; right:0; top:18%; height:64%;
+    background: linear-gradient(180deg,
+      transparent 0 7.4%, rgba(244,239,225,0.55) 7.4% 8%,
+      transparent 8% 15.4%, rgba(244,239,225,0.55) 15.4% 16%,
+      transparent 16% 23.4%, rgba(244,239,225,0.55) 23.4% 24%,
+      transparent 24% 31.4%, rgba(244,239,225,0.55) 31.4% 32%,
+      transparent 32% 39.4%, rgba(244,239,225,0.55) 39.4% 40%,
+      transparent 40% 47.4%, rgba(244,239,225,0.55) 47.4% 48%,
+      transparent 48% 55.4%, rgba(244,239,225,0.55) 55.4% 56%,
+      transparent 56% 100%);
+  }
+  .ilustracao-pista-intro .bandeira-intro{
+    position:absolute; top:8%; left:6%; font-size: clamp(20px, 5vw, 34px);
+  }
+  .ilustracao-pista-intro .trofeu-intro{
+    position:absolute; top:8%; right:6%; font-size: clamp(20px, 5vw, 34px);
+  }
+  .corredor-intro{
+    position:absolute; top:44%; width: 11%; aspect-ratio:1/1; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: clamp(12px, 3vw, 18px); box-sizing:border-box; z-index:2;
+    animation: correrIntro 3.2s ease-in-out infinite;
+  }
+  .corredor-intro.corredor-jogador{
+    background:#ffffff; border:3px solid #1957c2; left:8%;
+    box-shadow: 0 0 0 2px #ffffff, 0 2px 5px rgba(0,0,0,0.5);
+    animation-delay: 0s;
+  }
+  .corredor-intro.corredor-computador{
+    background:#1a1a1a; border:3px solid #ffd23f; left:20%;
+    box-shadow: 0 0 0 2px #1a1a1a, 0 2px 5px rgba(0,0,0,0.5);
+    animation-delay: 0.5s;
+  }
+  @keyframes correrIntro{
+    0%{ transform: translateX(0); }
+    50%{ transform: translateX(220%); }
+    100%{ transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .corredor-intro{ animation:none; }
+  }
+
+  .area-corrida{
+    display:flex; flex-direction:column; align-items:center; gap: 18px;
+    width:100%; max-width: 720px;
+  }
+
+  .painel-corrida{
+    width:100%; display:grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; background: rgba(0,0,0,0.25); border: 1px solid var(--linha);
+    border-radius: 12px; padding: 10px 14px;
+  }
+  .painel-item{ text-align:center; font-size: 11.5px; }
+  .painel-item b{ display:block; font-size: 15px; color: var(--dourado); font-family: var(--fonte-titulo); }
+
+  .turno-corrida{
+    font-size: 13px; font-weight:800; text-align:center; padding: 7px 16px;
+    border-radius: 999px; background: rgba(242,169,59,0.18); border: 1px solid var(--dourado);
+    color: var(--dourado); letter-spacing:0.3px; min-height: 32px; display:flex; align-items:center;
+  }
+  .turno-corrida.vez-computador{ background: rgba(47,143,209,0.18); border-color:#2f8fd1; color:#8fc8f0; }
+
+  .pista-corrida{
+    position:relative; width:100%; max-width: 640px; aspect-ratio: 2/1.05;
+    background: #c0392b;
+    border-radius: 999px; overflow:hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border: 3px solid rgba(244,239,225,0.25);
+  }
+  .arquibancada-corrida{
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 2%, transparent 2% 4%);
+    pointer-events:none;
+  }
+  .faixa-pista-externa{
+    position:absolute; top:3%; left:3%; right:3%; bottom:3%;
+    border: 2px solid rgba(244,239,225,0.35); border-radius: 999px; pointer-events:none;
+  }
+  .grama-central{
+    position:absolute; top:19%; left:19%; width:62%; height:62%;
+    background: repeating-linear-gradient(100deg, #2f8f4e 0 8%, #37a25a 8% 16%);
+    border-radius: 999px; display:flex; align-items:center; justify-content:center;
+    font-size: clamp(22px, 5vw, 40px); opacity:0.95;
+    box-shadow: 0 0 0 3px rgba(244,239,225,0.3);
+  }
+  .casa-pista{
+    position:absolute; width: 8%; aspect-ratio: 1/1; transform: translate(-50%, -50%);
+    background: var(--giz); border-radius: 6px; display:flex; align-items:center; justify-content:center;
+    font-size: clamp(8px, 1.8vw, 12px); font-weight:800; color: var(--quadra-escura);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(0,0,0,0.15); z-index:2;
+  }
+  .casa-pista.pergunta{ background: var(--dourado); }
+  .casa-pista.pergunta::after{ content:'❓'; font-size: clamp(10px, 2.4vw, 15px); }
+  .casa-pista.pergunta span{ display:none; }
+  .casa-pista.largada{ background: #4caf50; color: #fff; }
+  .casa-pista.chegada{
+    background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0/ 40% 40%;
+    color:#111;
+  }
+
+  .peao-corrida{
+    position:absolute; width: 9%; aspect-ratio: 1/1; transform: translate(-50%, -50%);
+    display:flex; align-items:center; justify-content:center;
+    font-size: clamp(15px, 3.4vw, 24px);
+    transition: left 0.35s ease, top 0.35s ease; z-index: 6;
+    border-radius: 50%; box-sizing: border-box;
+  }
+  .peao-corrida.peao-jogador{
+    background: #ffffff; border: 3px solid #1957c2;
+    box-shadow: 0 0 0 2px #ffffff, 0 3px 6px rgba(0,0,0,0.6);
+  }
+  .peao-corrida.peao-computador{
+    background: #1a1a1a; border: 3px solid #ffd23f;
+    box-shadow: 0 0 0 2px #1a1a1a, 0 3px 6px rgba(0,0,0,0.6);
+    z-index: 5;
+  }
+
+  .legenda-jogadores{
+    display:flex; gap: 18px; justify-content:center; font-size: 12px; flex-wrap:wrap;
+  }
+  .legenda-jogadores span{ display:inline-flex; align-items:center; gap:6px; }
+  .bolinha-legenda{ width:14px; height:14px; border-radius:50%; display:inline-block; }
+  .bolinha-legenda.jogador{ background:#ffffff; border:2px solid #1957c2; }
+  .bolinha-legenda.computador{ background:#1a1a1a; border:2px solid #ffd23f; }
+
+  .controle-dado{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .dado-corrida{
+    width: 66px; height: 66px; background: var(--giz); border-radius: 12px;
+    display:grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr);
+    padding: 9px; gap: 3px; cursor:pointer; box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+    transition: transform 0.15s ease;
+  }
+  .dado-corrida:hover{ transform: translateY(-2px); }
+  .dado-corrida.desabilitado{ opacity:0.4; cursor:not-allowed; }
+  .dado-corrida.rolando{ animation: rolarDado 0.5s linear infinite; }
+  @keyframes rolarDado{ 0%{ transform: rotate(0deg); } 100%{ transform: rotate(360deg); } }
+  .pip-dado{ border-radius:50%; background: transparent; }
+  .pip-dado.ativo{ background: var(--quadra-escura); }
+  .dica-dado{ font-size: 11.5px; opacity:0.75; }
+
+  .overlay-pergunta-corrida{
+    position: fixed; inset:0; background: rgba(0,0,0,0.7); z-index: 50;
+    display:flex; align-items:center; justify-content:center; padding: 20px;
+  }
+  .cartao-pergunta-corrida{
+    background: var(--quadra); border: 2px solid var(--dourado); border-radius: 16px;
+    padding: 26px 22px; max-width: 480px; width:100%; box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  }
+  .cartao-pergunta-corrida .categoria-pergunta-corrida{
+    font-size: 11.5px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado);
+    font-weight:700; margin-bottom: 8px;
+  }
+  .cartao-pergunta-corrida .enunciado-corrida{
+    font-family: var(--fonte-titulo); font-size: clamp(15px, 3.4vw, 19px); margin-bottom: 18px; line-height:1.35;
+  }
+  .opcoes-corrida{ display:flex; flex-direction:column; gap: 10px; }
+  .opcao-corrida{
+    text-align:left; background: rgba(244,239,225,0.08); border: 2px solid var(--linha);
+    color: var(--giz); border-radius: 10px; padding: 12px 14px; cursor:pointer;
+    font-size: 13px; line-height:1.4; font-family: var(--fonte-corpo);
+  }
+  .opcao-corrida b{ color: var(--dourado); margin-right:6px; }
+  .opcao-corrida:hover:not(:disabled){ background: rgba(244,239,225,0.16); }
+  .opcao-corrida:disabled{ cursor:default; }
+  .opcao-corrida.correta{ background: rgba(76,175,80,0.28); border-color:#4caf50; }
+  .opcao-corrida.incorreta{ background: rgba(214,69,69,0.28); border-color:#d64545; }
+  .feedback-corrida{
+    margin-top:14px; font-size: 13.5px; text-align:center; font-weight:700; min-height: 20px;
+  }
+  .feedback-corrida.acerto{ color:#7ee08a; }
+  .feedback-corrida.erro{ color:#ff9d9d; }
+
+  .btn-som-efeitos{
+    background: rgba(0,0,0,0.25); color: var(--giz); border: 2px solid var(--linha);
+    border-radius: 999px; padding: 6px 14px; font-size: 11.5px; font-weight:700; cursor:pointer;
+  }
+  .btn-som-efeitos:hover{ border-color: var(--dourado); }
+
+  .vitoria-corrida-medalha{ font-size: 64px; margin-bottom: 4px; }
+  .confetti-container{
+    position: fixed; inset:0; pointer-events:none; overflow:hidden; z-index: 60;
+  }
+  .confete{
+    position:absolute; top:-20px; width:10px; height:14px; opacity:0.9;
+    animation: cair linear forwards;
+  }
+  @keyframes cair{
+    to{ transform: translateY(110vh) rotate(360deg); opacity:0.3; }
+  }
+  .stats-vitoria-corrida{
+    display:grid; grid-template-columns: repeat(2, 1fr); gap:8px 20px;
+    max-width: 360px; margin: 0 auto 10px; text-align:left; font-size:13px;
+  }
+  .stats-vitoria-corrida b{ color: var(--dourado); }
+
+  /* ---------- RODAPÉ ---------- */
+  footer{ margin-top:auto; padding-top: 26px; text-align:center; font-size:18px; opacity:0.75; letter-spacing:0.3px; }
+
+  .btn-musica{
+    position: fixed; top: 14px; right: 14px; z-index: 20;
+    background: rgba(0,0,0,0.35); color: var(--giz); border: 2px solid var(--linha);
+    border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight:700;
+    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(2px);
+  }
+  .btn-musica:hover{ border-color: var(--dourado); }
+  footer b{ color: var(--dourado); }
+
+  @media (prefers-reduced-motion: reduce){ .carta-interior, .cat-card, .jogo-card, .btn{ transition:none !important; } }
+</style>
+</head>
+<body>
+
+<button class="btn-musica" id="btn-musica">🔊 Música</button>
+<div class="central-line"></div>
+<div class="central-circle"></div>
+
+<div class="app">
+
+  <header class="titulo">
+    <div class="escola">E.E.E.F.M. Ilda Ferreira da Fonseca Martins</div>
+    <h1>JOGOS DE <span class="destaque">EDUCAÇÃO FÍSICA</span></h1>
+    <div class="faixa-conteudo">
+      <span class="bola">🏅</span>
+      <span class="texto">Classificação dos Esportes</span>
+      <span class="bola">🏅</span>
+    </div>
+  </header>
+
+  <!-- TELA DE IDENTIFICAÇÃO -->
+  <section id="tela-nome">
+    <div class="cartao-identificacao">
+      <h2>Antes de começar...</h2>
+      <p>Preencha seus dados para iniciar os jogos:</p>
+      <div class="campo">
+        <label for="input-nome">Nome completo</label>
+        <input type="text" id="input-nome" placeholder="Digite seu nome completo">
+      </div>
+      <div class="campo">
+        <label for="input-turma">Turma</label>
+        <input type="text" id="input-turma" placeholder="Ex: 9º ano A">
+      </div>
+      <span class="erro-campo" id="erro-identificacao"></span>
+      <button class="btn" id="btn-confirmar-nome" style="width:100%;">Continuar</button>
+    </div>
+  </section>
+
+  <!-- MENU DE JOGOS -->
+  <section id="tela-menu" class="escondido">
+    <div class="crachá-aluno" id="crachá-aluno"></div>
+    <p class="instrucao">Escolha um jogo para começar:</p>
+    <div class="grid-menu">
+      <button class="jogo-card j1" id="btn-jogo-memoria">
+        <span class="emoji">🧠</span>
+        <div class="jogo-nome">Jogo da Memória</div>
+        <div class="jogo-desc">Encontre os pares de esportes dentro de cada categoria.</div>
+      </button>
+      <button class="jogo-card j2" id="btn-jogo-classificando">
+        <span class="emoji">🗂️</span>
+        <div class="jogo-nome">Classificando os Esportes</div>
+        <div class="jogo-desc">Revele a carta e clique no tipo de esporte correto.</div>
+      </button>
+      <button class="jogo-card j3" id="btn-jogo-quiz">
+        <span class="emoji">❓</span>
+        <div class="jogo-nome">Acerte a Pergunta</div>
+        <div class="jogo-desc">Quiz com os conceitos de cada tipo de esporte.</div>
+      </button>
+      <button class="jogo-card j4" id="btn-jogo-cruzadas">
+        <span class="emoji">📝</span>
+        <div class="jogo-nome">Palavras Cruzadas</div>
+        <div class="jogo-desc">Use as dicas para preencher o diagrama com 15 esportes.</div>
+      </button>
+      <button class="jogo-card j5" id="btn-jogo-caca">
+        <span class="emoji">🔍</span>
+        <div class="jogo-nome">Caça-Palavras</div>
+        <div class="jogo-desc">Encontre 15 palavras escondidas na horizontal, vertical e diagonal.</div>
+      </button>
+      <button class="jogo-card j6" id="btn-jogo-corrida">
+        <span class="emoji">🏁</span>
+        <div class="jogo-nome">Corrida dos Campeões</div>
+        <div class="jogo-desc">Jogue o dado, responda perguntas e corra até a linha de chegada.</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 1: MEMÓRIA ===================== -->
+  <section id="tela-inicial" class="escondido">
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-menu-1">Voltar ao menu</button>
+    </div>
+    <p class="instrucao">Escolha uma categoria de esportes para começar a jogar:</p>
+    <div class="grid-categorias" id="grid-categorias"></div>
+  </section>
+
+  <section id="tela-jogo" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo" id="titulo-categoria-jogo"></div>
+      <div class="placar">
+        <span>Jogadas: <b id="contador-jogadas">0</b></span>
+        <span>Pares: <b id="contador-pares">0</b>/4</span>
+      </div>
+      <button class="btn secundario" id="btn-voltar-categorias">Voltar</button>
+    </div>
+    <div class="tabuleiro" id="tabuleiro"></div>
+  </section>
+
+  <section id="tela-vitoria" class="vitoria escondido">
+    <div class="troféu">🏆</div>
+    <h2 id="titulo-vitoria">Parabéns, você venceu!</h2>
+    <p id="texto-vitoria"></p>
+    <div class="btns">
+      <button class="btn" id="btn-jogar-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-outra-categoria">Outra categoria</button>
+      <button class="btn secundario" id="btn-menu-1">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 2: CLASSIFICANDO OS ESPORTES ===================== -->
+  <section id="tela-classificar" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo">Classificando os Esportes</div>
+      <div class="placar">
+        <span>Acertos: <b id="contador-acertos-classificar">0</b>/20</span>
+      </div>
+      <button class="btn secundario" id="btn-voltar-menu-2">Voltar ao menu</button>
+    </div>
+    <p class="instrucao">Clique em uma carta para revelar o esporte e depois clique no tipo de esporte correspondente.</p>
+    <div class="area-classificar">
+      <div class="coluna-cartas">
+        <div class="tabuleiro-classificar" id="tabuleiro-classificar"></div>
+      </div>
+      <div class="coluna-categorias">
+        <button class="btn-categoria marca" data-categoria="marca">Esportes de Marca</button>
+        <button class="btn-categoria invasao" data-categoria="invasao">Esportes de Invasão</button>
+        <button class="btn-categoria precisao" data-categoria="precisao">Esportes de Precisão</button>
+        <button class="btn-categoria combinatorio" data-categoria="combinatorio">Esportes Técnico-Combinatórios</button>
+        <button class="btn-categoria rede" data-categoria="rede">Esportes de Rede</button>
+        <div class="aviso-classificar" id="aviso-classificar">Selecione uma carta primeiro!</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tela-vitoria-classificar" class="vitoria escondido">
+    <div class="troféu">🏆</div>
+    <h2 id="titulo-vitoria-classificar">Parabéns!</h2>
+    <p id="texto-vitoria-classificar"></p>
+    <div class="btns">
+      <button class="btn" id="btn-classificar-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-menu-2">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 3: ACERTE A PERGUNTA (QUIZ) ===================== -->
+  <section id="tela-quiz-categorias" class="escondido">
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-menu-3-categorias">Voltar ao menu</button>
+    </div>
+    <p class="instrucao">Escolha uma categoria de esportes para responder o quiz:</p>
+    <div class="grid-categorias" id="grid-categorias-quiz"></div>
+  </section>
+
+  <section id="tela-quiz" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo" id="titulo-categoria-quiz">Acerte a Pergunta</div>
+      <div class="placar"><span>Acertos: <b id="contador-acertos-quiz">0</b>/<b id="total-perguntas-quiz">0</b></span></div>
+      <button class="btn secundario" id="btn-voltar-menu-3">Voltar ao menu</button>
+    </div>
+    <div class="cartao-quiz">
+      <div class="quiz-contador" id="quiz-contador">Pergunta 1 de 4</div>
+      <div class="quiz-pergunta" id="quiz-pergunta"></div>
+      <div class="quiz-opcoes" id="quiz-opcoes"></div>
+    </div>
+  </section>
+
+  <section id="tela-vitoria-quiz" class="vitoria escondido">
+    <div class="troféu">🏆</div>
+    <h2 id="titulo-vitoria-quiz">Quiz finalizado!</h2>
+    <p id="texto-vitoria-quiz"></p>
+    <div class="btns">
+      <button class="btn" id="btn-quiz-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-quiz-outra-categoria">Outra categoria</button>
+      <button class="btn secundario" id="btn-menu-3">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 4: PALAVRAS CRUZADAS ===================== -->
+  <section id="tela-cruzadas" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo">Palavras Cruzadas<small>15 esportes do jogo</small></div>
+      <div class="placar"><span>Acertos: <b id="contador-acertos-cruzadas">0</b>/15</span></div>
+      <div class="btns-topo">
+        <button class="btn secundario" id="btn-verificar-cruzadas">Verificar</button>
+        <button class="btn secundario" id="btn-voltar-menu-4">Voltar ao menu</button>
+      </div>
+    </div>
+    <div class="area-cruzadas">
+      <div class="grade-cruzadas" id="grade-cruzadas"></div>
+      <div class="colunas-dicas">
+        <div class="lista-dicas">
+          <h3>Horizontais</h3>
+          <ul id="lista-dicas-horizontais"></ul>
+        </div>
+        <div class="lista-dicas">
+          <h3>Verticais</h3>
+          <ul id="lista-dicas-verticais"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tela-vitoria-cruzadas" class="vitoria escondido">
+    <div class="troféu">🏆</div>
+    <h2 id="titulo-vitoria-cruzadas">Parabéns!</h2>
+    <p id="texto-vitoria-cruzadas"></p>
+    <div class="btns">
+      <button class="btn" id="btn-cruzadas-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-menu-4">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 5: CAÇA-PALAVRAS ===================== -->
+  <section id="tela-caca" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo">Caça-Palavras<small>15 palavras escondidas</small></div>
+      <div class="placar"><span>Encontradas: <b id="contador-encontradas-caca">0</b>/15</span></div>
+      <button class="btn secundario" id="btn-voltar-menu-5">Voltar ao menu</button>
+    </div>
+    <div class="area-caca">
+      <div class="grade-caca" id="grade-caca"></div>
+      <div class="lista-palavras-caca" id="lista-palavras-caca"></div>
+    </div>
+  </section>
+
+  <section id="tela-vitoria-caca" class="vitoria escondido">
+    <div class="troféu">🏆</div>
+    <h2 id="titulo-vitoria-caca">Parabéns!</h2>
+    <p id="texto-vitoria-caca"></p>
+    <div class="btns">
+      <button class="btn" id="btn-caca-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-menu-5">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 6: CORRIDA DOS CAMPEÕES ===================== -->
+  <section id="tela-corrida-intro" class="escondido">
+    <div class="intro-corrida">
+      <h1 style="font-size: clamp(22px,5vw,32px); margin:0;">🏁 Corrida dos Campeões</h1>
+      <div class="ilustracao-pista-intro">
+        <span class="bandeira-intro">🏳️</span>
+        <span class="trofeu-intro">🏆</span>
+        <span class="corredor-intro corredor-jogador">🏃</span>
+        <span class="corredor-intro corredor-computador">🤖</span>
+      </div>
+      <p class="instrucao">Escolha uma categoria para iniciar a corrida:</p>
+      <div class="grid-categorias" id="grid-categorias-corrida"></div>
+      <button class="btn secundario" id="btn-voltar-menu-6-intro">Voltar ao menu</button>
+    </div>
+  </section>
+
+  <section id="tela-corrida-jogo" class="escondido">
+    <div class="area-corrida">
+      <div class="painel-corrida">
+        <div class="painel-item">🏁 Categoria<b id="painel-categoria-corrida">-</b></div>
+        <div class="painel-item">📍 Sua casa<b id="painel-casa-corrida">1</b>/30</div>
+        <div class="painel-item">🤖 Computador<b id="painel-casa-computador-corrida">1</b>/30</div>
+        <div class="painel-item">🎲 Jogadas<b id="painel-jogadas-corrida">0</b></div>
+        <div class="painel-item">✅ Acertos<b id="painel-acertos-corrida">0</b></div>
+        <div class="painel-item">❌ Erros<b id="painel-erros-corrida">0</b></div>
+        <div class="painel-item">📊 Aproveitamento<b id="painel-aproveitamento-corrida">0%</b></div>
+      </div>
+      <div class="btns-topo">
+        <button class="btn-som-efeitos" id="btn-som-efeitos-corrida">🔊 Efeitos</button>
+        <button class="btn secundario" id="btn-voltar-menu-6">Voltar ao menu</button>
+      </div>
+      <div class="turno-corrida" id="turno-corrida">Sua vez! 🎲</div>
+      <div class="legenda-jogadores">
+        <span><span class="bolinha-legenda jogador"></span>Você</span>
+        <span><span class="bolinha-legenda computador"></span>Computador</span>
+      </div>
+      <div class="pista-corrida" id="pista-corrida">
+        <div class="arquibancada-corrida"></div>
+        <div class="faixa-pista-externa"></div>
+        <div class="grama-central">🏟️</div>
+        <div class="peao-corrida peao-jogador" id="peao-corrida">🏃</div>
+        <div class="peao-corrida peao-computador" id="peao-computador">🤖</div>
+      </div>
+      <div class="controle-dado">
+        <div class="dado-corrida" id="dado-corrida">
+          <div class="pip-dado"></div><div class="pip-dado"></div><div class="pip-dado"></div>
+          <div class="pip-dado"></div><div class="pip-dado"></div><div class="pip-dado"></div>
+          <div class="pip-dado"></div><div class="pip-dado"></div><div class="pip-dado"></div>
+        </div>
+        <div class="dica-dado">Toque no dado para jogar</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="overlay-pergunta-corrida" class="overlay-pergunta-corrida escondido">
+    <div class="cartao-pergunta-corrida">
+      <div class="categoria-pergunta-corrida" id="categoria-pergunta-corrida"></div>
+      <div class="enunciado-corrida" id="enunciado-corrida"></div>
+      <div class="opcoes-corrida" id="opcoes-corrida"></div>
+      <div class="feedback-corrida" id="feedback-corrida"></div>
+    </div>
+  </div>
+
+  <section id="tela-vitoria-corrida" class="vitoria escondido">
+    <div class="vitoria-corrida-medalha" id="medalha-vitoria-corrida">🏆</div>
+    <h2 id="titulo-vitoria-corrida">Campeão!</h2>
+    <div class="stats-vitoria-corrida" id="stats-vitoria-corrida"></div>
+    <div class="btns">
+      <button class="btn" id="btn-corrida-de-novo">Jogar novamente</button>
+      <button class="btn secundario" id="btn-corrida-outra-categoria">Outra categoria</button>
+      <button class="btn secundario" id="btn-menu-6">Menu principal</button>
+    </div>
+  </section>
+
+  <footer>Criado por: <b>Professor Bruno Dias de Oliveira</b></footer>
+</div>
+
+<script>
+(function(){
+
+  /* ---------- ÁUDIO: MÚSICA DE FUNDO E EFEITOS SONOROS ---------- */
+  let audioCtx = null;
+  let musicaAtiva = true;
+  let efeitosSonorosAtivos = true;
+  let musicaTimerId = null;
+  let musicaPasso = 0;
+
+  // Melodia animada e saltitante (Dó maior), com variações de ritmo e um contorno mais vivo
+  const PADRAO_MUSICA = [
+    523.25, 659.25, 783.99, 659.25, 523.25, null, 659.25, 783.99,
+    880.00, 783.99, 659.25, null, 587.33, 739.99, 880.00, 739.99,
+    587.33, null, 739.99, 880.00, 987.77, 880.00, 739.99, null,
+    523.25, 783.99, 659.25, 523.25, null, 659.25, 783.99, 1046.50,
+    880.00, 783.99, 659.25, 587.33, null, 523.25, 659.25, 783.99
+  ];
+
+  function garantirAudioContext(){
+    if(!audioCtx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return null;
+      audioCtx = new AC();
+    }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+    return audioCtx;
+  }
+
+  function tocarNota(freq, duracao, tipoOnda, volume, atrasoSeg){
+    const ctx = garantirAudioContext();
+    if(!ctx) return;
+    const inicio = ctx.currentTime + (atrasoSeg || 0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = tipoOnda;
+    osc.frequency.setValueAtTime(freq, inicio);
+    gain.gain.setValueAtTime(0.0001, inicio);
+    gain.gain.linearRampToValueAtTime(volume, inicio + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, inicio + duracao);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(inicio);
+    osc.stop(inicio + duracao + 0.02);
+  }
+
+  function passoMusica(){
+    if(!musicaAtiva) return;
+    const freq = PADRAO_MUSICA[musicaPasso % PADRAO_MUSICA.length];
+    if(freq){ tocarNota(freq, 0.2, 'triangle', 0.014); }
+    musicaPasso++;
+  }
+
+  function iniciarMusica(){
+    garantirAudioContext();
+    if(musicaTimerId) return;
+    musicaTimerId = setInterval(passoMusica, 150);
+  }
+
+  function pararMusica(){
+    if(musicaTimerId){ clearInterval(musicaTimerId); musicaTimerId = null; }
+  }
+
+  const botaoMusica = document.getElementById('btn-musica');
+  botaoMusica.addEventListener('click', () => {
+    musicaAtiva = !musicaAtiva;
+    botaoMusica.textContent = musicaAtiva ? '🔊 Música' : '🔇 Música';
+    if(musicaAtiva){ garantirAudioContext(); iniciarMusica(); }
+    else { pararMusica(); }
+  });
+
+  function tocarSomAcerto(){
+    if(!efeitosSonorosAtivos) return;
+    garantirAudioContext();
+    tocarNota(659.25, 0.12, 'triangle', 0.18, 0);
+    tocarNota(987.77, 0.18, 'triangle', 0.18, 0.09);
+  }
+
+  function tocarSomErro(){
+    if(!efeitosSonorosAtivos) return;
+    garantirAudioContext();
+    tocarNota(196.00, 0.22, 'sawtooth', 0.13, 0);
+    tocarNota(146.83, 0.28, 'sawtooth', 0.13, 0.11);
+  }
+
+  function tocarSomVitoria(){
+    if(!efeitosSonorosAtivos) return;
+    garantirAudioContext();
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+      tocarNota(freq, 0.22, 'triangle', 0.16, i * 0.12);
+    });
+  }
+
+  function tocarSomDado(){
+    if(!efeitosSonorosAtivos) return;
+    garantirAudioContext();
+    for(let i = 0; i < 5; i++){
+      tocarNota(200 + Math.random()*150, 0.05, 'square', 0.05, i * 0.09);
+    }
+  }
+
+  function tocarSomMovimento(){
+    if(!efeitosSonorosAtivos) return;
+    garantirAudioContext();
+    tocarNota(440, 0.06, 'triangle', 0.09, 0);
+  }
+
+  /* ---------- ÍCONES (pictogramas em SVG) ---------- */
+  const COR_FIGURA = "#123524";
+
+  const ICONES = {
+    atletismo: `<svg viewBox="0 0 100 100"><circle cx="58" cy="16" r="8" fill="${COR_FIGURA}"/><path d="M58 24 L48 52 M48 52 L28 44 M48 52 L58 40 M48 52 L60 78 M48 52 L30 84" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/></svg>`,
+    natacao: `<svg viewBox="0 0 100 100"><circle cx="20" cy="42" r="8" fill="${COR_FIGURA}"/><path d="M28 45 L72 50 M40 46 L22 30 M52 48 L60 62 M72 50 L88 38 M72 50 L88 60" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M8 78 Q20 70 32 78 T56 78 T80 78 T104 78" stroke="${COR_FIGURA}" stroke-width="4" fill="none" opacity="0.4"/></svg>`,
+    levantamento: `<svg viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M50 26 L50 55 M50 30 L30 12 M50 30 L70 12 M50 55 L36 84 M50 55 L64 84" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M20 12 L80 12" stroke="${COR_FIGURA}" stroke-width="6" stroke-linecap="round"/><circle cx="20" cy="12" r="9" fill="${COR_FIGURA}"/><circle cx="80" cy="12" r="9" fill="${COR_FIGURA}"/></svg>`,
+    ciclismo: `<svg viewBox="0 0 100 100"><circle cx="22" cy="76" r="15" fill="none" stroke="${COR_FIGURA}" stroke-width="5"/><circle cx="78" cy="76" r="15" fill="none" stroke="${COR_FIGURA}" stroke-width="5"/><path d="M22 76 L48 40 L78 76 M48 40 L58 76 M48 40 L38 24" stroke="${COR_FIGURA}" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="42" cy="18" r="7" fill="${COR_FIGURA}"/><path d="M38 24 L58 22" stroke="${COR_FIGURA}" stroke-width="5" stroke-linecap="round"/></svg>`,
+    futebol: `<svg viewBox="0 0 100 100"><circle cx="35" cy="16" r="8" fill="${COR_FIGURA}"/><path d="M35 24 L40 52 M40 52 L22 42 M40 52 L58 44 M40 52 L34 82 M40 52 L64 62" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="76" cy="70" r="9" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/></svg>`,
+    basquete: `<svg viewBox="0 0 100 100"><circle cx="42" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M42 26 L46 55 M46 30 L64 10 M46 32 L28 20 M46 55 L32 84 M46 55 L58 82" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="68" cy="8" r="8" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/><path d="M78 4 L92 4" stroke="${COR_FIGURA}" stroke-width="4" stroke-linecap="round"/></svg>`,
+    handebol: `<svg viewBox="0 0 100 100"><circle cx="38" cy="16" r="8" fill="${COR_FIGURA}"/><path d="M38 24 L42 52 M42 30 L60 16 M42 32 L26 42 M42 52 L30 82 M42 52 L60 78" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="66" cy="12" r="7" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/></svg>`,
+    rugbi: `<svg viewBox="0 0 100 100"><circle cx="34" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M34 26 L42 54 M42 30 L58 38 M42 32 L24 42 M42 54 L30 84 M42 54 L62 66" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><ellipse cx="60" cy="42" rx="13" ry="8" fill="none" stroke="${COR_FIGURA}" stroke-width="4" transform="rotate(-25 60 42)"/></svg>`,
+    golfe: `<svg viewBox="0 0 100 100"><circle cx="46" cy="16" r="8" fill="${COR_FIGURA}"/><path d="M46 24 L46 54 M46 30 L70 66 M46 32 L34 40 M46 54 L34 84 M46 54 L58 84" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="78" cy="82" r="5" fill="${COR_FIGURA}"/></svg>`,
+    bocha: `<svg viewBox="0 0 100 100"><circle cx="24" cy="46" r="7" fill="${COR_FIGURA}"/><path d="M24 53 L34 66 M34 66 L20 78 M34 66 L48 80 M28 58 L14 62" stroke="${COR_FIGURA}" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="55" cy="82" r="6" fill="${COR_FIGURA}"/><circle cx="80" cy="78" r="12" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/><circle cx="80" cy="78" r="4" fill="${COR_FIGURA}"/></svg>`,
+    sinuca: `<svg viewBox="0 0 100 100"><rect x="10" y="30" width="80" height="46" rx="4" fill="none" stroke="${COR_FIGURA}" stroke-width="5"/><circle cx="10" cy="30" r="5" fill="${COR_FIGURA}"/><circle cx="90" cy="30" r="5" fill="${COR_FIGURA}"/><circle cx="10" cy="76" r="5" fill="${COR_FIGURA}"/><circle cx="90" cy="76" r="5" fill="${COR_FIGURA}"/><circle cx="55" cy="53" r="7" fill="${COR_FIGURA}"/><circle cx="72" cy="53" r="7" fill="none" stroke="${COR_FIGURA}" stroke-width="3"/><line x1="14" y1="90" x2="50" y2="58" stroke="${COR_FIGURA}" stroke-width="4" stroke-linecap="round"/></svg>`,
+    tiro_arco: `<svg viewBox="0 0 100 100"><circle cx="30" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M30 26 L34 55 M34 55 L24 84 M34 55 L46 82" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M34 30 Q50 45 34 60" stroke="${COR_FIGURA}" stroke-width="4" fill="none"/><line x1="34" y1="30" x2="70" y2="45" stroke="${COR_FIGURA}" stroke-width="3"/><line x1="34" y1="60" x2="70" y2="45" stroke="${COR_FIGURA}" stroke-width="3"/><circle cx="86" cy="45" r="11" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/><circle cx="86" cy="45" r="4" fill="${COR_FIGURA}"/></svg>`,
+    ginastica: `<svg viewBox="0 0 100 100"><circle cx="30" cy="78" r="7" fill="${COR_FIGURA}"/><path d="M30 71 L46 46 M46 46 L30 28 M46 46 L70 30 M46 46 L74 58" stroke="${COR_FIGURA}" stroke-width="6" stroke-linecap="round" fill="none"/><line x1="20" y1="88" x2="40" y2="88" stroke="${COR_FIGURA}" stroke-width="5" stroke-linecap="round"/></svg>`,
+    nado_sincronizado: `<svg viewBox="0 0 100 100"><path d="M10 70 Q25 60 40 70 T70 70 T100 70" stroke="${COR_FIGURA}" stroke-width="4" fill="none" opacity="0.45"/><line x1="42" y1="70" x2="38" y2="20" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round"/><line x1="58" y1="70" x2="62" y2="20" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round"/><path d="M35 18 L41 8 M65 18 L59 8" stroke="${COR_FIGURA}" stroke-width="5" stroke-linecap="round"/></svg>`,
+    skate: `<svg viewBox="0 0 100 100"><circle cx="48" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M48 26 L48 52 M48 32 L28 40 M48 32 L68 24 M48 52 L30 68 M48 52 L64 68" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><rect x="18" y="76" width="64" height="8" rx="4" fill="${COR_FIGURA}"/><circle cx="30" cy="90" r="6" fill="${COR_FIGURA}"/><circle cx="70" cy="90" r="6" fill="${COR_FIGURA}"/></svg>`,
+    patinacao: `<svg viewBox="0 0 100 100"><circle cx="48" cy="16" r="8" fill="${COR_FIGURA}"/><path d="M48 24 L46 52 M46 30 L26 22 M46 32 L68 40 M46 52 L34 80 M46 52 L70 60" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><line x1="26" y1="84" x2="42" y2="84" stroke="${COR_FIGURA}" stroke-width="5" stroke-linecap="round"/></svg>`,
+    voleibol: `<svg viewBox="0 0 100 100"><circle cx="45" cy="14" r="8" fill="${COR_FIGURA}"/><path d="M45 22 L48 50 M48 28 L66 12 M48 30 L30 40 M48 50 L36 82 M48 50 L60 80" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="70" cy="8" r="7" fill="none" stroke="${COR_FIGURA}" stroke-width="4"/><line x1="0" y1="60" x2="100" y2="60" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/><line x1="0" y1="60" x2="0" y2="46" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/><line x1="100" y1="60" x2="100" y2="46" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/></svg>`,
+    tenis: `<svg viewBox="0 0 100 100"><circle cx="35" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M35 26 L40 54 M40 30 L60 20 M40 32 L24 44 M40 54 L30 84 M40 54 L54 80" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><ellipse cx="66" cy="14" rx="9" ry="12" fill="none" stroke="${COR_FIGURA}" stroke-width="3" transform="rotate(20 66 14)"/><circle cx="82" cy="46" r="5" fill="${COR_FIGURA}"/><line x1="0" y1="70" x2="100" y2="70" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/></svg>`,
+    badminton: `<svg viewBox="0 0 100 100"><circle cx="35" cy="18" r="8" fill="${COR_FIGURA}"/><path d="M35 26 L40 54 M40 30 L58 14 M40 32 L24 44 M40 54 L30 84 M40 54 L54 80" stroke="${COR_FIGURA}" stroke-width="7" stroke-linecap="round" fill="none"/><ellipse cx="64" cy="10" rx="8" ry="10" fill="none" stroke="${COR_FIGURA}" stroke-width="3" transform="rotate(15 64 10)"/><path d="M80 40 L86 30 L92 40 Z" fill="${COR_FIGURA}"/><line x1="86" y1="40" x2="86" y2="48" stroke="${COR_FIGURA}" stroke-width="3"/><line x1="0" y1="70" x2="100" y2="70" stroke="${COR_FIGURA}" stroke-width="3" opacity="0.5"/></svg>`,
+    tenis_mesa: `<svg viewBox="0 0 100 100"><rect x="10" y="40" width="80" height="34" rx="3" fill="none" stroke="${COR_FIGURA}" stroke-width="5"/><line x1="50" y1="34" x2="50" y2="80" stroke="${COR_FIGURA}" stroke-width="4"/><circle cx="30" cy="57" r="5" fill="${COR_FIGURA}"/><ellipse cx="76" cy="20" rx="10" ry="7" fill="none" stroke="${COR_FIGURA}" stroke-width="4" transform="rotate(-20 76 20)"/><line x1="82" y1="24" x2="90" y2="34" stroke="${COR_FIGURA}" stroke-width="4" stroke-linecap="round"/></svg>`
+  };
+
+  const CATEGORY_INFO = {
+    marca: { nome: "Esportes de Marca", cor: "marca", corHex: "#8f2323" },
+    invasao: { nome: "Esportes de Invasão", cor: "invasao", corHex: "#17408f" },
+    precisao: { nome: "Esportes de Precisão", cor: "precisao", corHex: "#4a1f8f" },
+    combinatorio: { nome: "Esportes Técnico-Combinatórios", cor: "combinatorio", corHex: "#9c5a0d" },
+    rede: { nome: "Esportes de Rede", cor: "rede", corHex: "#1a6b30" }
+  };
+
+  const SPORTS = [
+    { id:'atletismo', nome:'Atletismo', icone: ICONES.atletismo, categoria:'marca' },
+    { id:'natacao', nome:'Natação', icone: ICONES.natacao, categoria:'marca' },
+    { id:'levantamento', nome:'Levant. de Peso', icone: ICONES.levantamento, categoria:'marca' },
+    { id:'ciclismo', nome:'Ciclismo', icone: ICONES.ciclismo, categoria:'marca' },
+    { id:'futebol', nome:'Futebol', icone: ICONES.futebol, categoria:'invasao' },
+    { id:'basquete', nome:'Basquete', icone: ICONES.basquete, categoria:'invasao' },
+    { id:'handebol', nome:'Handebol', icone: ICONES.handebol, categoria:'invasao' },
+    { id:'rugbi', nome:'Rúgbi', icone: ICONES.rugbi, categoria:'invasao' },
+    { id:'golfe', nome:'Golfe', icone: ICONES.golfe, categoria:'precisao' },
+    { id:'bocha', nome:'Bocha', icone: ICONES.bocha, categoria:'precisao' },
+    { id:'sinuca', nome:'Sinuca', icone: ICONES.sinuca, categoria:'precisao' },
+    { id:'tiro_arco', nome:'Tiro c/ Arco', icone: ICONES.tiro_arco, categoria:'precisao' },
+    { id:'ginastica', nome:'Ginástica Artíst.', icone: ICONES.ginastica, categoria:'combinatorio' },
+    { id:'nado_sincronizado', nome:'Nado Sincron.', icone: ICONES.nado_sincronizado, categoria:'combinatorio' },
+    { id:'skate', nome:'Skate', icone: ICONES.skate, categoria:'combinatorio' },
+    { id:'patinacao', nome:'Patinação Artíst.', icone: ICONES.patinacao, categoria:'combinatorio' }
+  ];
+
+  const SPORTS_REDE = [
+    { id:'voleibol', nome:'Voleibol', icone: ICONES.voleibol, categoria:'rede' },
+    { id:'tenis', nome:'Tênis', icone: ICONES.tenis, categoria:'rede' },
+    { id:'badminton', nome:'Badminton', icone: ICONES.badminton, categoria:'rede' },
+    { id:'tenis_mesa', nome:'Tênis de Mesa', icone: ICONES.tenis_mesa, categoria:'rede' }
+  ];
+
+  // Usado apenas para montar as categorias do Jogo da Memória (inclui Esportes de Rede).
+  // Os jogos "Classificando os Esportes" e "Acerte a Pergunta" continuam usando só SPORTS (16 esportes).
+  const SPORTS_MEMORIA = SPORTS.concat(SPORTS_REDE);
+
+  const CATEGORIAS = {};
+  Object.keys(CATEGORY_INFO).forEach(chave => {
+    const cartas = SPORTS_MEMORIA.filter(s => s.categoria === chave);
+    CATEGORIAS[chave] = {
+      nome: CATEGORY_INFO[chave].nome,
+      cor: CATEGORY_INFO[chave].cor,
+      corHex: CATEGORY_INFO[chave].corHex,
+      exemplos: cartas.map(c => c.nome),
+      cartas: cartas.map(c => ({ nome: c.nome, icone: c.icone }))
+    };
+  });
+
+  // Perguntas de "Acerte a Pergunta", organizadas por categoria de esporte
+  // (listas de exercícios fornecidas pelo professor).
+  const QUIZ_CATEGORIAS = {
+    invasao: [
+      {
+        pergunta: 'Qual o conceito de esporte de invasão?',
+        opcoes: [
+          'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos.',
+          'São modalidades esportivas em que o resultado é determinado pela melhor marca (tempo, distância, altura ou peso) alcançada pelo atleta.',
+          'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo.',
+          'São modalidades em que o objetivo é acertar um alvo ou fazer com que um objeto chegue o mais próximo possível de um alvo, exigindo controle dos movimentos e concentração.',
+          'São aqueles em que os participantes, separados por uma rede, buscam fazer a bola ou outro implemento tocar o solo da quadra adversária ou provocar um erro do adversário.'
+        ],
+        correta: 0
+      },
+      {
+        pergunta: 'Marque a alternativa que contém uma característica geral dos esportes de invasão.',
+        opcoes: [
+          'É sempre disputado na grama',
+          'São esportes individuais',
+          'A equipe vencedora é aquela que terminar a prova no menor tempo.',
+          'Objetivo de marcar pontos no campo do adversário.'
+        ],
+        correta: 3
+      },
+      {
+        pergunta: 'Qual alternativa não é um princípio tático dos esportes de invasão?',
+        opcoes: ['Defesa', 'Ataque', 'Precisão', 'Transição'],
+        correta: 2
+      },
+      {
+        pergunta: 'Qual opção não é um exemplo de esporte de invasão?',
+        opcoes: ['Futebol', 'Vôlei', 'Handebol', 'Basquete'],
+        correta: 1
+      }
+    ],
+    rede: [
+      {
+        pergunta: 'Qual o conceito de esporte de rede?',
+        opcoes: [
+          'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos.',
+          'São modalidades esportivas em que o resultado é determinado pela melhor marca (tempo, distância, altura ou peso) alcançada pelo atleta.',
+          'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo.',
+          'São modalidades em que o objetivo é acertar um alvo ou fazer com que um objeto chegue o mais próximo possível de um alvo, exigindo controle dos movimentos e concentração.',
+          'São aqueles em que os participantes, separados por uma rede, buscam fazer a bola ou outro implemento tocar o solo da quadra adversária ou provocar um erro do adversário.'
+        ],
+        correta: 4
+      },
+      {
+        pergunta: 'Qual opção não é um exemplo de esporte de rede?',
+        opcoes: ['Rugby', 'Vôlei', 'Futevôlei', 'Tênis'],
+        correta: 0
+      },
+      {
+        pergunta: 'Qual alternativa não é uma característica dos esportes de rede?',
+        opcoes: [
+          'Os jogadores ou equipes ficam separados por uma rede.',
+          'Não há contato físico entre os adversários.',
+          'Objetivo de marcar pontos no campo do adversário.',
+          'O objetivo é dificultar a devolução da bola ou implemento.'
+        ],
+        correta: 2
+      },
+      {
+        pergunta: 'Nos esportes de rede, qual o nome do fundamento que inicia o ponto?',
+        opcoes: ['Bloqueio', 'Recepção', 'Saque', 'Levantamento'],
+        correta: 2
+      }
+    ],
+    combinatorio: [
+      {
+        pergunta: 'Qual o conceito de esporte técnico-combinatório?',
+        opcoes: [
+          'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos.',
+          'São modalidades esportivas em que o resultado é determinado pela melhor marca (tempo, distância, altura ou peso) alcançada pelo atleta.',
+          'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo.',
+          'São modalidades em que o objetivo é acertar um alvo ou fazer com que um objeto chegue o mais próximo possível de um alvo, exigindo controle dos movimentos e concentração.',
+          'São aqueles em que os participantes, separados por uma rede, buscam fazer a bola ou outro implemento tocar o solo da quadra adversária ou provocar um erro do adversário.'
+        ],
+        correta: 2
+      },
+      {
+        pergunta: 'Qual opção é um exemplo de esporte técnico-combinatório?',
+        opcoes: ['Rugby', 'Vôlei', 'Ginástica Rítmica', 'Handebol'],
+        correta: 2
+      },
+      {
+        pergunta: 'Qual regra não faz parte dos esportes técnicos-combinatórios?',
+        opcoes: [
+          'Avaliação feita por juízes.',
+          'Presença de duas equipes.',
+          'Tempo limite para cada apresentação.',
+          'É obrigatória a execução de elementos técnicos obrigatórios.'
+        ],
+        correta: 1
+      },
+      {
+        pergunta: 'Nos esportes técnicos-combinatórios, a avaliação é feita por quem?',
+        opcoes: ['Internet', 'Juízes', 'Técnicos', 'Capitães'],
+        correta: 1
+      }
+    ],
+    precisao: [
+      {
+        pergunta: 'Qual o conceito de esporte de precisão?',
+        opcoes: [
+          'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos.',
+          'São modalidades esportivas em que o resultado é determinado pela melhor marca (tempo, distância, altura ou peso) alcançada pelo atleta.',
+          'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo.',
+          'São modalidades em que o objetivo é acertar um alvo ou fazer com que um objeto chegue o mais próximo possível de um alvo, exigindo controle dos movimentos e concentração.',
+          'São aqueles em que os participantes, separados por uma rede, buscam fazer a bola ou outro implemento tocar o solo da quadra adversária ou provocar um erro do adversário.'
+        ],
+        correta: 3
+      },
+      {
+        pergunta: 'Qual opção é um exemplo de esporte de precisão?',
+        opcoes: ['Basquete', 'Boliche', 'Ciclismo', 'Ginástica'],
+        correta: 1
+      },
+      {
+        pergunta: 'Qual é o principal objetivo dos esportes de precisão?',
+        opcoes: [
+          'Ser o mais rápido possível.',
+          'Derrubar o adversário.',
+          'Acertar um alvo com exatidão.',
+          'Fazer mais pontos que o adversário.'
+        ],
+        correta: 2
+      },
+      {
+        pergunta: 'Entre as opções, qual é uma habilidade muito importante para praticar esportes de precisão?',
+        opcoes: ['Força bruta.', 'Controle de força e concentração.', 'Velocidade máxima.', 'Saltos e corridas.'],
+        correta: 1
+      }
+    ],
+    marca: [
+      {
+        pergunta: 'Qual o conceito de esporte de marca?',
+        opcoes: [
+          'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos.',
+          'São modalidades esportivas em que o resultado é determinado pela melhor marca (tempo, distância, altura ou peso) alcançada pelo atleta.',
+          'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo.',
+          'São modalidades em que o objetivo é acertar um alvo ou fazer com que um objeto chegue o mais próximo possível de um alvo, exigindo controle dos movimentos e concentração.',
+          'São aqueles em que os participantes, separados por uma rede, buscam fazer a bola ou outro implemento tocar o solo da quadra adversária ou provocar um erro do adversário.'
+        ],
+        correta: 1
+      },
+      {
+        pergunta: 'Qual opção não é um exemplo de esporte de marca?',
+        opcoes: ['Halterofilismo', 'Boliche', 'Natação', 'Ginástica'],
+        correta: 3
+      },
+      {
+        pergunta: 'Qual dos objetos abaixo não é um equipamento utilizado nos esportes de marca?',
+        opcoes: ['Régua', 'Cronômetro', 'Sensor', 'Capacete'],
+        correta: 3
+      },
+      {
+        pergunta: 'As marcas dos esportes de marca NÃO podem ser medidas em:',
+        opcoes: ['Tempo', 'Distância', 'Peso', 'Velocidade'],
+        correta: 3
+      }
+    ]
+  };
+
+  /* ---------- ELEMENTOS COMUNS ---------- */
+  const telaNome = document.getElementById('tela-nome');
+  const telaMenu = document.getElementById('tela-menu');
+  const crachaAluno = document.getElementById('crachá-aluno');
+  const inputNome = document.getElementById('input-nome');
+  const inputTurma = document.getElementById('input-turma');
+  const erroIdentificacao = document.getElementById('erro-identificacao');
+
+  let nomeAluno = '';
+  let turmaAluno = '';
+
+  function embaralhar(array){
+    const a = array.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function esconderTodasAsTelas(){
+    ['tela-nome','tela-menu','tela-inicial','tela-jogo','tela-vitoria',
+     'tela-classificar','tela-vitoria-classificar',
+     'tela-quiz-categorias','tela-quiz','tela-vitoria-quiz',
+     'tela-cruzadas','tela-vitoria-cruzadas',
+     'tela-caca','tela-vitoria-caca',
+     'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida'
+    ].forEach(id => document.getElementById(id).classList.add('escondido'));
+  }
+
+  function irParaMenu(){
+    esconderTodasAsTelas();
+    telaMenu.classList.remove('escondido');
+  }
+
+  document.getElementById('btn-confirmar-nome').addEventListener('click', () => {
+    const nome = inputNome.value.trim();
+    const turma = inputTurma.value.trim();
+    if(!nome || !turma){
+      erroIdentificacao.textContent = 'Preencha o nome completo e a turma para continuar.';
+      return;
+    }
+    nomeAluno = nome;
+    turmaAluno = turma;
+    erroIdentificacao.textContent = '';
+    crachaAluno.innerHTML = `Aluno(a): <b>${nomeAluno}</b> &nbsp;|&nbsp; Turma: <b>${turmaAluno}</b>`;
+    iniciarMusica();
+    irParaMenu();
+  });
+
+  document.getElementById('btn-jogo-memoria').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-inicial').classList.remove('escondido');
+  });
+  document.getElementById('btn-jogo-classificando').addEventListener('click', iniciarClassificando);
+  document.getElementById('btn-jogo-quiz').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-quiz-categorias').classList.remove('escondido');
+  });
+  document.getElementById('btn-jogo-cruzadas').addEventListener('click', iniciarCruzadas);
+  document.getElementById('btn-jogo-caca').addEventListener('click', iniciarCaca);
+  document.getElementById('btn-jogo-corrida').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-corrida-intro').classList.remove('escondido');
+  });
+
+  document.getElementById('btn-voltar-menu-1').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-1').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-2').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-2').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-3').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-3').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-3-categorias').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-4').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-4').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-5').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-5').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-6-intro').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-6').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-6').addEventListener('click', irParaMenu);
+
+  /* ===================== JOGO 1: MEMÓRIA ===================== */
+  const gridCategorias = document.getElementById('grid-categorias');
+  const tabuleiro = document.getElementById('tabuleiro');
+  const tituloCategoriaJogo = document.getElementById('titulo-categoria-jogo');
+  const contadorJogadas = document.getElementById('contador-jogadas');
+  const contadorPares = document.getElementById('contador-pares');
+  const textoVitoria = document.getElementById('texto-vitoria');
+  const tituloVitoria = document.getElementById('titulo-vitoria');
+
+  let categoriaAtual = null;
+  let cartaVirada1 = null;
+  let cartaVirada2 = null;
+  let bloqueado = false;
+  let jogadas = 0;
+  let paresEncontrados = 0;
+
+  Object.keys(CATEGORIAS).forEach((chave, i) => {
+    const cat = CATEGORIAS[chave];
+    const btn = document.createElement('button');
+    btn.className = `cat-card ${cat.cor}`;
+    btn.innerHTML = `
+      <div class="cat-numero">0${i+1}</div>
+      <div class="cat-nome">${cat.nome}</div>
+      <div class="cat-exemplos">${cat.exemplos.join(' · ')}</div>
+    `;
+    btn.addEventListener('click', () => iniciarJogoMemoria(chave));
+    gridCategorias.appendChild(btn);
+  });
+
+  function iniciarJogoMemoria(chaveCategoria){
+    categoriaAtual = CATEGORIAS[chaveCategoria];
+    jogadas = 0;
+    paresEncontrados = 0;
+    cartaVirada1 = null;
+    cartaVirada2 = null;
+    bloqueado = false;
+
+    document.documentElement.style.setProperty('--card-cor', categoriaAtual.corHex);
+    tituloCategoriaJogo.innerHTML = `${categoriaAtual.nome}<small>${nomeAluno} — Turma ${turmaAluno}</small>`;
+    contadorJogadas.textContent = '0';
+    contadorPares.textContent = '0';
+
+    let pares = [];
+    categoriaAtual.cartas.forEach((c, idx) => {
+      pares.push({ id: idx, nome: c.nome, icone: c.icone });
+      pares.push({ id: idx, nome: c.nome, icone: c.icone });
+    });
+    pares = embaralhar(pares);
+
+    tabuleiro.innerHTML = '';
+    pares.forEach((par) => {
+      const carta = document.createElement('div');
+      carta.className = 'carta';
+      carta.dataset.id = par.id;
+      carta.innerHTML = `
+        <div class="carta-interior">
+          <div class="face verso"></div>
+          <div class="face frente">
+            <div class="icone">${par.icone}</div>
+            <div class="nome">${par.nome}</div>
+          </div>
+        </div>
+      `;
+      carta.addEventListener('click', () => virarCarta(carta));
+      tabuleiro.appendChild(carta);
+    });
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-jogo').classList.remove('escondido');
+  }
+
+  function virarCarta(carta){
+    if(bloqueado) return;
+    if(carta.classList.contains('virada') || carta.classList.contains('encontrada')) return;
+    if(carta === cartaVirada1) return;
+
+    carta.classList.add('virada');
+
+    if(!cartaVirada1){ cartaVirada1 = carta; return; }
+
+    cartaVirada2 = carta;
+    bloqueado = true;
+    jogadas++;
+    contadorJogadas.textContent = jogadas;
+
+    const combinou = cartaVirada1.dataset.id === cartaVirada2.dataset.id;
+
+    if(combinou){
+      tocarSomAcerto();
+      setTimeout(() => {
+        cartaVirada1.classList.add('encontrada');
+        cartaVirada2.classList.add('encontrada');
+        cartaVirada1.classList.remove('virada');
+        cartaVirada2.classList.remove('virada');
+        paresEncontrados++;
+        contadorPares.textContent = paresEncontrados;
+        cartaVirada1 = null;
+        cartaVirada2 = null;
+        bloqueado = false;
+        if(paresEncontrados === 4){ setTimeout(mostrarVitoriaMemoria, 500); }
+      }, 500);
+    } else {
+      tocarSomErro();
+      cartaVirada1.classList.add('erro');
+      cartaVirada2.classList.add('erro');
+      setTimeout(() => {
+        cartaVirada1.classList.remove('virada','erro');
+        cartaVirada2.classList.remove('virada','erro');
+        cartaVirada1 = null;
+        cartaVirada2 = null;
+        bloqueado = false;
+      }, 900);
+    }
+  }
+
+  function mostrarVitoriaMemoria(){
+    tocarSomVitoria();
+    tituloVitoria.textContent = `Parabéns, ${nomeAluno}!`;
+    textoVitoria.textContent = `Você completou "${categoriaAtual.nome}" em ${jogadas} jogadas. (Turma ${turmaAluno})`;
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-voltar-categorias').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-inicial').classList.remove('escondido');
+  });
+  document.getElementById('btn-jogar-de-novo').addEventListener('click', () => {
+    iniciarJogoMemoria(Object.keys(CATEGORIAS).find(k => CATEGORIAS[k] === categoriaAtual));
+  });
+  document.getElementById('btn-outra-categoria').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-inicial').classList.remove('escondido');
+  });
+
+  /* ===================== JOGO 2: CLASSIFICANDO OS ESPORTES ===================== */
+  const tabuleiroClassificar = document.getElementById('tabuleiro-classificar');
+  const contadorAcertosClassificar = document.getElementById('contador-acertos-classificar');
+  const avisoClassificar = document.getElementById('aviso-classificar');
+  const tituloVitoriaClassificar = document.getElementById('titulo-vitoria-classificar');
+  const textoVitoriaClassificar = document.getElementById('texto-vitoria-classificar');
+
+  let classSelecionada = null;
+  let classAcertos = 0;
+  let classTentativas = 0;
+
+  function iniciarClassificando(){
+    classSelecionada = null;
+    classAcertos = 0;
+    classTentativas = 0;
+    contadorAcertosClassificar.textContent = '0';
+    avisoClassificar.classList.remove('mostrar');
+
+    const embaralhados = embaralhar(SPORTS_MEMORIA);
+    tabuleiroClassificar.innerHTML = '';
+    embaralhados.forEach(sport => {
+      const carta = document.createElement('div');
+      carta.className = 'carta carta-pequena';
+      carta.dataset.categoria = sport.categoria;
+      carta.innerHTML = `
+        <div class="carta-interior">
+          <div class="face verso"></div>
+          <div class="face frente">
+            <div class="icone">${sport.icone}</div>
+            <div class="nome">${sport.nome}</div>
+          </div>
+        </div>
+      `;
+      carta.addEventListener('click', () => selecionarCartaClassificar(carta));
+      tabuleiroClassificar.appendChild(carta);
+    });
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-classificar').classList.remove('escondido');
+  }
+
+  function selecionarCartaClassificar(carta){
+    if(carta.classList.contains('classificada')) return;
+    if(classSelecionada && classSelecionada !== carta){
+      classSelecionada.classList.remove('selecionada','virada');
+    }
+    carta.classList.add('virada','selecionada');
+    classSelecionada = carta;
+  }
+
+  document.querySelectorAll('.btn-categoria').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(!classSelecionada){
+        avisoClassificar.classList.add('mostrar');
+        setTimeout(() => avisoClassificar.classList.remove('mostrar'), 1500);
+        return;
+      }
+      classTentativas++;
+      const chaveCategoria = btn.dataset.categoria;
+      const correta = classSelecionada.dataset.categoria === chaveCategoria;
+
+      if(correta){
+        tocarSomAcerto();
+        classSelecionada.classList.add('classificada');
+        classSelecionada.classList.remove('selecionada');
+        classAcertos++;
+        contadorAcertosClassificar.textContent = classAcertos;
+        classSelecionada = null;
+        if(classAcertos === SPORTS_MEMORIA.length){
+          setTimeout(mostrarVitoriaClassificar, 500);
+        }
+      } else {
+        tocarSomErro();
+        classSelecionada.classList.add('erro');
+        const cartaErrada = classSelecionada;
+        setTimeout(() => {
+          cartaErrada.classList.remove('virada','selecionada','erro');
+        }, 800);
+        classSelecionada = null;
+      }
+    });
+  });
+
+  function mostrarVitoriaClassificar(){
+    tocarSomVitoria();
+    tituloVitoriaClassificar.textContent = `Parabéns, ${nomeAluno}!`;
+    textoVitoriaClassificar.textContent = `Você classificou todos os ${SPORTS_MEMORIA.length} esportes em ${classTentativas} tentativas. (Turma ${turmaAluno})`;
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-classificar').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-classificar-de-novo').addEventListener('click', iniciarClassificando);
+
+  /* ===================== JOGO 3: ACERTE A PERGUNTA (QUIZ) ===================== */
+  const gridCategoriasQuiz = document.getElementById('grid-categorias-quiz');
+  const tituloCategoriaQuiz = document.getElementById('titulo-categoria-quiz');
+  const quizContador = document.getElementById('quiz-contador');
+  const quizPergunta = document.getElementById('quiz-pergunta');
+  const quizOpcoes = document.getElementById('quiz-opcoes');
+  const contadorAcertosQuiz = document.getElementById('contador-acertos-quiz');
+  const totalPerguntasQuiz = document.getElementById('total-perguntas-quiz');
+  const tituloVitoriaQuiz = document.getElementById('titulo-vitoria-quiz');
+  const textoVitoriaQuiz = document.getElementById('texto-vitoria-quiz');
+
+  let quizCategoriaAtual = null;
+  let quizIndex = 0;
+  let quizScore = 0;
+  let quizPerguntas = [];
+
+  Object.keys(CATEGORY_INFO).forEach((chave, i) => {
+    const info = CATEGORY_INFO[chave];
+    const btn = document.createElement('button');
+    btn.className = `cat-card ${info.cor}`;
+    btn.innerHTML = `
+      <div class="cat-numero">0${i+1}</div>
+      <div class="cat-nome">${info.nome}</div>
+      <div class="cat-exemplos">${QUIZ_CATEGORIAS[chave].length} pergunta(s)</div>
+    `;
+    btn.addEventListener('click', () => iniciarQuiz(chave));
+    gridCategoriasQuiz.appendChild(btn);
+  });
+
+  function iniciarQuiz(chaveCategoria){
+    quizCategoriaAtual = chaveCategoria;
+    quizIndex = 0;
+    quizScore = 0;
+    quizPerguntas = QUIZ_CATEGORIAS[chaveCategoria];
+    tituloCategoriaQuiz.textContent = `Acerte a Pergunta — ${CATEGORY_INFO[chaveCategoria].nome}`;
+    contadorAcertosQuiz.textContent = '0';
+    totalPerguntasQuiz.textContent = quizPerguntas.length;
+    esconderTodasAsTelas();
+    document.getElementById('tela-quiz').classList.remove('escondido');
+    mostrarPerguntaQuiz();
+  }
+
+  function mostrarPerguntaQuiz(){
+    const q = quizPerguntas[quizIndex];
+    quizContador.textContent = `Pergunta ${quizIndex + 1} de ${quizPerguntas.length}`;
+    quizPergunta.textContent = q.pergunta;
+
+    quizOpcoes.innerHTML = '';
+    q.opcoes.forEach((opcao, indice) => {
+      const btn = document.createElement('button');
+      btn.className = 'opcao-quiz';
+      btn.textContent = opcao;
+      btn.addEventListener('click', () => responderQuiz(btn, indice === q.correta));
+      quizOpcoes.appendChild(btn);
+    });
+  }
+
+  function responderQuiz(botaoClicado, acertou){
+    const botoes = quizOpcoes.querySelectorAll('.opcao-quiz');
+    botoes.forEach(b => b.disabled = true);
+
+    const q = quizPerguntas[quizIndex];
+    botoes[q.correta].classList.add('correta');
+    if(!acertou) botaoClicado.classList.add('incorreta');
+    if(acertou){
+      tocarSomAcerto();
+      quizScore++;
+      contadorAcertosQuiz.textContent = quizScore;
+    } else {
+      tocarSomErro();
+    }
+
+    setTimeout(() => {
+      quizIndex++;
+      if(quizIndex < quizPerguntas.length){
+        mostrarPerguntaQuiz();
+      } else {
+        mostrarVitoriaQuiz();
+      }
+    }, 1400);
+  }
+
+  function mostrarVitoriaQuiz(){
+    tocarSomVitoria();
+    tituloVitoriaQuiz.textContent = `Parabéns, ${nomeAluno}!`;
+    textoVitoriaQuiz.textContent = `Você acertou ${quizScore} de ${quizPerguntas.length} perguntas em "${CATEGORY_INFO[quizCategoriaAtual].nome}". (Turma ${turmaAluno})`;
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-quiz').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-quiz-de-novo').addEventListener('click', () => iniciarQuiz(quizCategoriaAtual));
+  document.getElementById('btn-quiz-outra-categoria').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-quiz-categorias').classList.remove('escondido');
+  });
+
+  /* ===================== JOGO 4: PALAVRAS CRUZADAS ===================== */
+  const CRUZADAS_LINHAS = 14;
+  const CRUZADAS_COLUNAS = 15;
+
+  const CRUZADAS_PALAVRAS = [
+    { palavra:'PATINACAO', linha:0, coluna:2, direcao:'H', dica:'Esporte técnico-combinatório praticado sobre patins, com giros e saltos.' },
+    { palavra:'ATLETISMO', linha:0, coluna:3, direcao:'V', dica:'Conjunto de modalidades com corridas, saltos e arremessos; é um esporte de marca.' },
+    { palavra:'GINASTICA', linha:2, coluna:1, direcao:'V', dica:'Esporte técnico-combinatório que une força, flexibilidade e elementos acrobáticos.' },
+    { palavra:'BOCHA', linha:2, coluna:5, direcao:'V', dica:'Esporte de precisão em que se arremessam bolas o mais perto possível do bolim.' },
+    { palavra:'VOLEIBOL', linha:3, coluna:7, direcao:'V', dica:'Esporte de rede em que as equipes não podem deixar a bola cair no próprio campo.' },
+    { palavra:'CICLISMO', linha:3, coluna:9, direcao:'V', dica:'Esporte de marca disputado sobre uma bicicleta.' },
+    { palavra:'NATACAO', linha:4, coluna:1, direcao:'H', dica:'Esporte de marca praticado na piscina, com diferentes estilos de nado.' },
+    { palavra:'GOLFE', linha:4, coluna:14, direcao:'V', dica:'Esporte de precisão em que se usa um taco para colocar a bola no buraco.' },
+    { palavra:'SKATE', linha:6, coluna:3, direcao:'H', dica:'Esporte técnico-combinatório praticado sobre uma prancha com rodinhas.' },
+    { palavra:'FUTEBOL', linha:7, coluna:11, direcao:'V', dica:'Esporte de invasão jogado com os pés; o mais popular do Brasil.' },
+    { palavra:'BASQUETE', linha:8, coluna:7, direcao:'H', dica:'Esporte de invasão em que o objetivo é acertar a bola na cesta adversária.' },
+    { palavra:'TENIS', linha:9, coluna:4, direcao:'V', dica:'Esporte de rede jogado com raquetes, em quadras individuais ou em duplas.' },
+    { palavra:'HANDEBOL', linha:10, coluna:0, direcao:'H', dica:'Esporte de invasão jogado com as mãos, arremessando para marcar gols.' },
+    { palavra:'RUGBI', linha:12, coluna:0, direcao:'H', dica:'Esporte de invasão jogado com uma bola oval, com passes sempre para trás.' },
+    { palavra:'SINUCA', linha:13, coluna:4, direcao:'H', dica:'Esporte de precisão jogado em uma mesa, usando tacos e bolas coloridas.' }
+  ];
+
+  const gradeCruzadasEl = document.getElementById('grade-cruzadas');
+  const listaHorizontaisEl = document.getElementById('lista-dicas-horizontais');
+  const listaVerticaisEl = document.getElementById('lista-dicas-verticais');
+  const contadorAcertosCruzadas = document.getElementById('contador-acertos-cruzadas');
+  const tituloVitoriaCruzadas = document.getElementById('titulo-vitoria-cruzadas');
+  const textoVitoriaCruzadas = document.getElementById('texto-vitoria-cruzadas');
+
+  let cruzadasGrade = null;       // matriz [linha][coluna] -> {letra, inputEl, numero, palavrasIdx:[{index,pos}]}
+  let cruzadasPalavraAtiva = null; // índice em CRUZADAS_PALAVRAS
+  let cruzadasPalavrasResolvidas = new Set();
+
+  function construirGradeDadosCruzadas(){
+    const grade = [];
+    for(let r = 0; r < CRUZADAS_LINHAS; r++){
+      grade.push(new Array(CRUZADAS_COLUNAS).fill(null));
+    }
+    CRUZADAS_PALAVRAS.forEach((p, idx) => {
+      for(let i = 0; i < p.palavra.length; i++){
+        const r = p.linha + (p.direcao === 'V' ? i : 0);
+        const c = p.coluna + (p.direcao === 'H' ? i : 0);
+        if(!grade[r][c]){
+          grade[r][c] = { letra: p.palavra[i], palavrasIdx: [], numero: null };
+        }
+        grade[r][c].palavrasIdx.push({ index: idx, pos: i });
+      }
+    });
+    // numeração: células que são início de alguma palavra, em ordem de leitura
+    const celulasInicio = {};
+    CRUZADAS_PALAVRAS.forEach(p => { celulasInicio[`${p.linha},${p.coluna}`] = true; });
+    const chaves = Object.keys(celulasInicio).map(k => k.split(',').map(Number));
+    chaves.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    chaves.forEach((rc, i) => {
+      grade[rc[0]][rc[1]].numero = i + 1;
+    });
+    CRUZADAS_PALAVRAS.forEach(p => {
+      p.numero = grade[p.linha][p.coluna].numero;
+    });
+    return grade;
+  }
+
+  function renderizarGradeCruzadas(){
+    gradeCruzadasEl.style.gridTemplateColumns = `repeat(${CRUZADAS_COLUNAS}, 1fr)`;
+    gradeCruzadasEl.innerHTML = '';
+    for(let r = 0; r < CRUZADAS_LINHAS; r++){
+      for(let c = 0; c < CRUZADAS_COLUNAS; c++){
+        const dado = cruzadasGrade[r][c];
+        const divCelula = document.createElement('div');
+        if(!dado){
+          divCelula.className = 'celula-bloqueada';
+        } else {
+          divCelula.className = 'celula-cruzada';
+          divCelula.dataset.linha = r;
+          divCelula.dataset.coluna = c;
+          if(dado.numero){
+            const spanNumero = document.createElement('span');
+            spanNumero.className = 'numero-celula';
+            spanNumero.textContent = dado.numero;
+            divCelula.appendChild(spanNumero);
+          }
+          const input = document.createElement('input');
+          input.maxLength = 1;
+          input.autocomplete = 'off';
+          input.inputMode = 'text';
+          input.dataset.linha = r;
+          input.dataset.coluna = c;
+          input.addEventListener('focus', () => selecionarCelulaCruzadas(r, c));
+          input.addEventListener('input', () => tratarDigitacaoCruzadas(r, c, input));
+          input.addEventListener('keydown', (ev) => tratarTeclaCruzadas(ev, r, c));
+          dado.inputEl = input;
+          divCelula.appendChild(input);
+        }
+        gradeCruzadasEl.appendChild(divCelula);
+      }
+    }
+  }
+
+  function renderizarListasDicasCruzadas(){
+    listaHorizontaisEl.innerHTML = '';
+    listaVerticaisEl.innerHTML = '';
+    const ordenadas = CRUZADAS_PALAVRAS.slice().sort((a, b) => a.numero - b.numero);
+    ordenadas.forEach((p, idxOriginal) => {
+      const index = CRUZADAS_PALAVRAS.indexOf(p);
+      const li = document.createElement('li');
+      li.className = 'item-dica';
+      li.dataset.index = index;
+      li.innerHTML = `<b>${p.numero}.</b>${p.dica}`;
+      li.addEventListener('click', () => ativarPalavraCruzadas(index));
+      (p.direcao === 'H' ? listaHorizontaisEl : listaVerticaisEl).appendChild(li);
+    });
+  }
+
+  function limparDestaqueCruzadas(){
+    document.querySelectorAll('.celula-cruzada.ativa').forEach(el => el.classList.remove('ativa'));
+    document.querySelectorAll('.item-dica.ativa').forEach(el => el.classList.remove('ativa'));
+  }
+
+  function ativarPalavraCruzadas(index){
+    limparDestaqueCruzadas();
+    cruzadasPalavraAtiva = index;
+    const p = CRUZADAS_PALAVRAS[index];
+    const item = document.querySelector(`.item-dica[data-index="${index}"]`);
+    if(item) item.classList.add('ativa');
+
+    let primeiraVazia = null;
+    for(let i = 0; i < p.palavra.length; i++){
+      const r = p.linha + (p.direcao === 'V' ? i : 0);
+      const c = p.coluna + (p.direcao === 'H' ? i : 0);
+      const el = document.querySelector(`.celula-cruzada[data-linha="${r}"][data-coluna="${c}"]`);
+      if(el){
+        el.classList.add('ativa');
+        const input = cruzadasGrade[r][c].inputEl;
+        if(!primeiraVazia && !input.value) primeiraVazia = input;
+      }
+    }
+    const primeiroInput = cruzadasGrade[p.linha][p.coluna].inputEl;
+    (primeiraVazia || primeiroInput).focus();
+  }
+
+  function selecionarCelulaCruzadas(r, c){
+    const dado = cruzadasGrade[r][c];
+    if(!dado) return;
+    // se a palavra ativa atual passa por essa célula, mantém; senão escolhe a primeira palavra que passa por aqui
+    const passaPelaAtiva = cruzadasPalavraAtiva !== null &&
+      dado.palavrasIdx.some(item => item.index === cruzadasPalavraAtiva);
+    if(!passaPelaAtiva){
+      limparDestaqueCruzadas();
+      cruzadasPalavraAtiva = dado.palavrasIdx[0].index;
+      const item = document.querySelector(`.item-dica[data-index="${cruzadasPalavraAtiva}"]`);
+      if(item) item.classList.add('ativa');
+      const p = CRUZADAS_PALAVRAS[cruzadasPalavraAtiva];
+      for(let i = 0; i < p.palavra.length; i++){
+        const rr = p.linha + (p.direcao === 'V' ? i : 0);
+        const cc = p.coluna + (p.direcao === 'H' ? i : 0);
+        const el = document.querySelector(`.celula-cruzada[data-linha="${rr}"][data-coluna="${cc}"]`);
+        if(el) el.classList.add('ativa');
+      }
+    }
+  }
+
+  function proximaCelula(r, c, direcao, sentido){
+    if(direcao === 'H') return { r, c: c + sentido };
+    return { r: r + sentido, c };
+  }
+
+  function tratarDigitacaoCruzadas(r, c, input){
+    input.value = input.value.toUpperCase().replace(/[^A-ZÀ-Ú]/g, '').slice(0, 1);
+    input.parentElement.classList.remove('correta', 'incorreta');
+    if(input.value && cruzadasPalavraAtiva !== null){
+      const p = CRUZADAS_PALAVRAS[cruzadasPalavraAtiva];
+      const sentido = p.direcao === 'H' ? { r: 0, c: 1 } : { r: 1, c: 0 };
+      const prox = { r: r + sentido.r, c: c + sentido.c };
+      const proxDado = prox.r >= 0 && prox.r < CRUZADAS_LINHAS && prox.c >= 0 && prox.c < CRUZADAS_COLUNAS
+        ? cruzadasGrade[prox.r][prox.c] : null;
+      if(proxDado && proxDado.palavrasIdx.some(item => item.index === cruzadasPalavraAtiva)){
+        proxDado.inputEl.focus();
+      }
+    }
+    verificarPreenchimentoCompletoCruzadas();
+  }
+
+  function tratarTeclaCruzadas(ev, r, c){
+    const p = cruzadasPalavraAtiva !== null ? CRUZADAS_PALAVRAS[cruzadasPalavraAtiva] : null;
+    const dirH = { r: 0, c: 1 }, dirV = { r: 1, c: 0 };
+    let alvo = null;
+
+    if(ev.key === 'ArrowRight') alvo = { r, c: c + 1 };
+    else if(ev.key === 'ArrowLeft') alvo = { r, c: c - 1 };
+    else if(ev.key === 'ArrowDown') alvo = { r: r + 1, c };
+    else if(ev.key === 'ArrowUp') alvo = { r: r - 1, c };
+    else if(ev.key === 'Backspace' && !ev.target.value && p){
+      const sentido = p.direcao === 'H' ? dirH : dirV;
+      alvo = { r: r - sentido.r, c: c - sentido.c };
+    }
+
+    if(alvo){
+      const dado = alvo.r >= 0 && alvo.r < CRUZADAS_LINHAS && alvo.c >= 0 && alvo.c < CRUZADAS_COLUNAS
+        ? cruzadasGrade[alvo.r][alvo.c] : null;
+      if(dado){
+        ev.preventDefault();
+        dado.inputEl.focus();
+      }
+    }
+  }
+
+  function verificarPreenchimentoCompletoCruzadas(){
+    let completo = true;
+    for(let r = 0; r < CRUZADAS_LINHAS; r++){
+      for(let c = 0; c < CRUZADAS_COLUNAS; c++){
+        const dado = cruzadasGrade[r][c];
+        if(dado && !dado.inputEl.value){ completo = false; }
+      }
+    }
+    if(completo) verificarCruzadas(true);
+  }
+
+  function verificarCruzadas(automatico){
+    let todasCorretas = true;
+    const resolvidasAgora = new Set();
+
+    CRUZADAS_PALAVRAS.forEach((p, idx) => {
+      let palavraCorreta = true;
+      for(let i = 0; i < p.palavra.length; i++){
+        const r = p.linha + (p.direcao === 'V' ? i : 0);
+        const c = p.coluna + (p.direcao === 'H' ? i : 0);
+        const dado = cruzadasGrade[r][c];
+        const valor = dado.inputEl.value;
+        if(valor && valor !== p.palavra[i]) palavraCorreta = false;
+        if(!valor) palavraCorreta = false;
+      }
+      if(palavraCorreta) resolvidasAgora.add(idx);
+      else todasCorretas = false;
+    });
+
+    // aplica destaque visual célula a célula
+    for(let r = 0; r < CRUZADAS_LINHAS; r++){
+      for(let c = 0; c < CRUZADAS_COLUNAS; c++){
+        const dado = cruzadasGrade[r][c];
+        if(!dado) continue;
+        dado.inputEl.parentElement.classList.remove('correta', 'incorreta');
+        if(!dado.inputEl.value) continue;
+        const correta = dado.inputEl.value === dado.letra;
+        dado.inputEl.parentElement.classList.add(correta ? 'correta' : 'incorreta');
+      }
+    }
+
+    resolvidasAgora.forEach(idx => {
+      if(!cruzadasPalavrasResolvidas.has(idx)){
+        const item = document.querySelector(`.item-dica[data-index="${idx}"]`);
+        if(item) item.classList.add('resolvida');
+      }
+    });
+    cruzadasPalavrasResolvidas = resolvidasAgora;
+    contadorAcertosCruzadas.textContent = cruzadasPalavrasResolvidas.size;
+
+    if(todasCorretas){
+      tocarSomVitoria();
+      setTimeout(mostrarVitoriaCruzadas, 400);
+    } else if(!automatico){
+      tocarSomErro();
+    } else if(automatico && cruzadasPalavrasResolvidas.size > 0){
+      tocarSomAcerto();
+    }
+  }
+
+  document.getElementById('btn-verificar-cruzadas').addEventListener('click', () => verificarCruzadas(false));
+
+  function iniciarCruzadas(){
+    cruzadasPalavraAtiva = null;
+    cruzadasPalavrasResolvidas = new Set();
+    contadorAcertosCruzadas.textContent = '0';
+    cruzadasGrade = construirGradeDadosCruzadas();
+    renderizarGradeCruzadas();
+    renderizarListasDicasCruzadas();
+    esconderTodasAsTelas();
+    document.getElementById('tela-cruzadas').classList.remove('escondido');
+  }
+
+  function mostrarVitoriaCruzadas(){
+    tituloVitoriaCruzadas.textContent = `Parabéns, ${nomeAluno}!`;
+    textoVitoriaCruzadas.textContent = `Você completou as palavras cruzadas com os 15 esportes! (Turma ${turmaAluno})`;
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-cruzadas').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-cruzadas-de-novo').addEventListener('click', iniciarCruzadas);
+
+  /* ===================== JOGO 5: CAÇA-PALAVRAS ===================== */
+  const CACA_TAMANHO = 13;
+
+  const CACA_GRADE_LETRAS = [
+    ['Q','V','L','O','B','E','T','U','F','T','N','H','E'],
+    ['B','E','E','I','P','A','E','U','S','S','T','A','C'],
+    ['A','W','N','N','C','Q','A','B','A','H','C','H','C'],
+    ['S','Z','B','R','C','T','I','Q','N','I','A','R','S'],
+    ['Q','C','A','R','A','E','U','N','T','V','O','E','O'],
+    ['U','M','I','Q','D','E','D','S','V','N','Y','A','S'],
+    ['E','F','U','C','A','E','A','O','O','A','S','J','O'],
+    ['T','E','Y','C','L','N','F','M','R','I','S','U','Z'],
+    ['E','U','R','I','I','I','E','E','C','C','Q','A','S'],
+    ['U','O','W','G','O','T','S','E','S','T','J','E','O'],
+    ['F','W','Z','C','R','D','R','M','N','A','W','D','C'],
+    ['U','C','M','O','K','P','Z','T','O','E','T','E','N'],
+    ['C','P','C','E','T','R','O','P','S','E','Q','R','Z']
+  ];
+
+  const CACA_PALAVRAS = [
+    { palavra:'CRONOMETRO', linha:2, coluna:12, dr:1, dc:-1 },
+    { palavra:'GINASTICA', linha:9, coluna:3, dr:-1, dc:1 },
+    { palavra:'PRECISAO', linha:11, coluna:5, dr:-1, dc:1 },
+    { palavra:'CICLISMO', linha:4, coluna:1, dr:1, dc:1 },
+    { palavra:'BASQUETE', linha:1, coluna:0, dr:1, dc:0 },
+    { palavra:'VENCEDOR', linha:0, coluna:1, dr:1, dc:1 },
+    { palavra:'INVASAO', linha:3, coluna:6, dr:1, dc:1 },
+    { palavra:'FUTEBOL', linha:0, coluna:8, dr:0, dc:-1 },
+    { palavra:'ESPORTE', linha:12, coluna:9, dr:0, dc:-1 },
+    { palavra:'DEFESA', linha:5, coluna:4, dr:1, dc:1 },
+    { palavra:'ATAQUE', linha:2, coluna:6, dr:1, dc:-1 },
+    { palavra:'MARCA', linha:5, coluna:1, dr:-1, dc:1 },
+    { palavra:'FORCA', linha:10, coluna:0, dr:-1, dc:1 },
+    { palavra:'SAQUE', linha:1, coluna:9, dr:1, dc:-1 },
+    { palavra:'REDE', linha:12, coluna:11, dr:-1, dc:0 }
+  ];
+
+  const gradeCacaEl = document.getElementById('grade-caca');
+  const listaPalavrasCacaEl = document.getElementById('lista-palavras-caca');
+  const contadorEncontradasCaca = document.getElementById('contador-encontradas-caca');
+  const tituloVitoriaCaca = document.getElementById('titulo-vitoria-caca');
+  const textoVitoriaCaca = document.getElementById('texto-vitoria-caca');
+
+  let cacaCelulasEl = [];      // matriz [linha][coluna] -> elemento da célula
+  let cacaEncontradas = new Set();
+  let cacaSelecionando = false;
+  let cacaInicio = null;
+  let cacaAtual = null;
+
+  function renderizarGradeCaca(){
+    gradeCacaEl.style.gridTemplateColumns = `repeat(${CACA_TAMANHO}, 1fr)`;
+    gradeCacaEl.innerHTML = '';
+    cacaCelulasEl = [];
+    for(let r = 0; r < CACA_TAMANHO; r++){
+      const linhaEls = [];
+      for(let c = 0; c < CACA_TAMANHO; c++){
+        const div = document.createElement('div');
+        div.className = 'celula-caca';
+        div.textContent = CACA_GRADE_LETRAS[r][c];
+        div.dataset.linha = r;
+        div.dataset.coluna = c;
+        div.addEventListener('pointerdown', (ev) => iniciarSelecaoCaca(ev, r, c));
+        gradeCacaEl.appendChild(div);
+        linhaEls.push(div);
+      }
+      cacaCelulasEl.push(linhaEls);
+    }
+  }
+
+  function renderizarListaPalavrasCaca(){
+    listaPalavrasCacaEl.innerHTML = '';
+    CACA_PALAVRAS.slice().sort((a, b) => a.palavra.localeCompare(b.palavra)).forEach(p => {
+      const span = document.createElement('span');
+      span.className = 'palavra-caca-item';
+      span.dataset.palavra = p.palavra;
+      span.textContent = p.palavra;
+      listaPalavrasCacaEl.appendChild(span);
+    });
+  }
+
+  function sinal(n){ return n > 0 ? 1 : (n < 0 ? -1 : 0); }
+
+  function limparSelecaoTemporariaCaca(){
+    document.querySelectorAll('.celula-caca.selecionando').forEach(el => el.classList.remove('selecionando'));
+  }
+
+  function celulasEntre(inicio, fim){
+    const dr = sinal(fim.r - inicio.r);
+    const dc = sinal(fim.c - inicio.c);
+    // só aceita linha reta: horizontal, vertical ou diagonal (45°)
+    if(dr !== 0 && dc !== 0 && Math.abs(fim.r - inicio.r) !== Math.abs(fim.c - inicio.c)) return null;
+    if(dr === 0 && dc === 0) return [inicio];
+    const passos = Math.max(Math.abs(fim.r - inicio.r), Math.abs(fim.c - inicio.c));
+    const cels = [];
+    for(let i = 0; i <= passos; i++){
+      cels.push({ r: inicio.r + dr*i, c: inicio.c + dc*i });
+    }
+    return cels;
+  }
+
+  function iniciarSelecaoCaca(ev, r, c){
+    ev.preventDefault();
+    cacaSelecionando = true;
+    cacaInicio = { r, c };
+    cacaAtual = { r, c };
+    limparSelecaoTemporariaCaca();
+    cacaCelulasEl[r][c].classList.add('selecionando');
+    gradeCacaEl.setPointerCapture(ev.pointerId);
+  }
+
+  gradeCacaEl.addEventListener('pointermove', (ev) => {
+    if(!cacaSelecionando) return;
+    const alvo = document.elementFromPoint(ev.clientX, ev.clientY);
+    if(!alvo || !alvo.classList.contains('celula-caca')) return;
+    const r = parseInt(alvo.dataset.linha, 10);
+    const c = parseInt(alvo.dataset.coluna, 10);
+    if(cacaAtual && cacaAtual.r === r && cacaAtual.c === c) return;
+    const cels = celulasEntre(cacaInicio, { r, c });
+    if(!cels) return;
+    cacaAtual = { r, c };
+    limparSelecaoTemporariaCaca();
+    cels.forEach(cel => cacaCelulasEl[cel.r][cel.c].classList.add('selecionando'));
+  });
+
+  gradeCacaEl.addEventListener('pointerup', finalizarSelecaoCaca);
+  gradeCacaEl.addEventListener('pointercancel', finalizarSelecaoCaca);
+
+  function finalizarSelecaoCaca(){
+    if(!cacaSelecionando) return;
+    cacaSelecionando = false;
+    const cels = celulasEntre(cacaInicio, cacaAtual);
+    limparSelecaoTemporariaCaca();
+    if(!cels || cels.length < 2){ cacaInicio = null; cacaAtual = null; return; }
+
+    const palavraFormada = cels.map(cel => CACA_GRADE_LETRAS[cel.r][cel.c]).join('');
+    const palavraInvertida = palavraFormada.split('').reverse().join('');
+
+    const encontrada = CACA_PALAVRAS.find(p =>
+      !cacaEncontradas.has(p.palavra) && (p.palavra === palavraFormada || p.palavra === palavraInvertida)
+    );
+
+    if(encontrada){
+      cacaEncontradas.add(encontrada.palavra);
+      cels.forEach(cel => cacaCelulasEl[cel.r][cel.c].classList.add('encontrada'));
+      const item = listaPalavrasCacaEl.querySelector(`[data-palavra="${encontrada.palavra}"]`);
+      if(item) item.classList.add('encontrada');
+      contadorEncontradasCaca.textContent = cacaEncontradas.size;
+      tocarSomAcerto();
+      if(cacaEncontradas.size === CACA_PALAVRAS.length){
+        setTimeout(mostrarVitoriaCaca, 500);
+      }
+    } else if(cels.length > 1) {
+      tocarSomErro();
+    }
+
+    cacaInicio = null;
+    cacaAtual = null;
+  }
+
+  function iniciarCaca(){
+    cacaEncontradas = new Set();
+    cacaSelecionando = false;
+    cacaInicio = null;
+    cacaAtual = null;
+    contadorEncontradasCaca.textContent = '0';
+    renderizarGradeCaca();
+    renderizarListaPalavrasCaca();
+    esconderTodasAsTelas();
+    document.getElementById('tela-caca').classList.remove('escondido');
+  }
+
+  function mostrarVitoriaCaca(){
+    tocarSomVitoria();
+    tituloVitoriaCaca.textContent = `Parabéns, ${nomeAluno}!`;
+    textoVitoriaCaca.textContent = `Você encontrou as 15 palavras escondidas! (Turma ${turmaAluno})`;
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-caca').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-caca-de-novo').addEventListener('click', iniciarCaca);
+
+  /* ===================== JOGO 6: CORRIDA DOS CAMPEÕES ===================== */
+
+  // Banco de perguntas: 10 por categoria (identificação, características, objetivos, regras, exemplos e curiosidades)
+  const BANCO_PERGUNTAS_CORRIDA = {
+    marca: [
+      { enunciado:'Qual característica define os esportes de marca?', opcoes:['Maior pontuação no placar','Melhor marca alcançada (tempo, distância, altura ou peso)','Eliminar o adversário do jogo','Ocupar o espaço do adversário'], correta:1 },
+      { enunciado:'Qual NÃO é um esporte de marca?', opcoes:['Natação','Atletismo','Voleibol','Ciclismo'], correta:2 },
+      { enunciado:'No atletismo, qual prova mede a marca em distância?', opcoes:['Salto em distância','Corrida de 100m rasos','Levantamento de peso','Nenhuma delas'], correta:0 },
+      { enunciado:'O halterofilismo mede a marca em:', opcoes:['Tempo','Distância','Peso','Altura'], correta:2 },
+      { enunciado:'Qual equipamento é comum nos esportes de marca?', opcoes:['Rede','Cronômetro','Taco','Alvo'], correta:1 },
+      { enunciado:'A natação é medida principalmente em:', opcoes:['Peso','Tempo','Altura','Pontos'], correta:1 },
+      { enunciado:'O salto com vara mede a marca em:', opcoes:['Tempo','Distância','Altura','Peso'], correta:2 },
+      { enunciado:'Qual esporte de marca é disputado sobre uma bicicleta?', opcoes:['Ciclismo','Skate','Patinação','Rugby'], correta:0 },
+      { enunciado:'Curiosidade: um recorde mundial de atletismo é batido quando o atleta:', opcoes:['Marca mais pontos que o rival','Supera a melhor marca já registrada','Vence no sorteio da prova','Chega em segundo lugar'], correta:1 },
+      { enunciado:'Qual NÃO é uma forma de medir a marca nesses esportes?', opcoes:['Tempo','Distância','Número de gols','Peso'], correta:2 }
+    ],
+    invasao: [
+      { enunciado:'O que caracteriza os esportes de invasão?', opcoes:['Times separados por uma rede','Times disputam o mesmo espaço para marcar pontos','Jogadores acertam um alvo fixo','Resultado medido em tempo'], correta:1 },
+      { enunciado:'Qual NÃO é um esporte de invasão?', opcoes:['Futebol','Basquete','Tênis','Handebol'], correta:2 },
+      { enunciado:'No basquete, os pontos são marcados quando a bola:', opcoes:['Toca o chão do adversário','Entra na cesta','Passa a linha de fundo','É tocada duas vezes seguidas'], correta:1 },
+      { enunciado:'Qual é um princípio tático fundamental dos esportes de invasão?', opcoes:['Precisão no alvo','Ataque e defesa','Flutuação na água','Saque inicial'], correta:1 },
+      { enunciado:'No handebol, os jogadores marcam pontos usando:', opcoes:['Os pés','Uma raquete','As mãos','Um taco'], correta:2 },
+      { enunciado:'O rugby é jogado com uma bola de formato:', opcoes:['Redondo','Oval','Quadrado','Triangular'], correta:1 },
+      { enunciado:'Qual fundamento é essencial para recuperar a posse de bola nos esportes de invasão?', opcoes:['Saque','Desarme','Cravada','Bandeira'], correta:1 },
+      { enunciado:'No futebol, quantos jogadores de linha uma equipe tem em campo (com goleiro, total)?', opcoes:['5','7','11','15'], correta:2 },
+      { enunciado:'Curiosidade: qual desses esportes NÃO permite o uso das mãos para jogar a bola (exceto o goleiro)?', opcoes:['Handebol','Basquete','Futebol','Rugby'], correta:2 },
+      { enunciado:'O objetivo comum dos esportes de invasão é:', opcoes:['Acertar um alvo fixo','Invadir o campo adversário para marcar pontos','Impedir a bola de tocar o chão','Executar uma coreografia'], correta:1 }
+    ],
+    precisao: [
+      { enunciado:'O que define os esportes de precisão?', opcoes:['Marcar gols no adversário','Acertar um alvo com exatidão','Invadir o campo adversário','Separar os times por uma rede'], correta:1 },
+      { enunciado:'Qual NÃO é um esporte de precisão?', opcoes:['Golfe','Sinuca','Bocha','Vôlei'], correta:3 },
+      { enunciado:'No golfe, o objetivo é:', opcoes:['Marcar mais pontos que o adversário','Colocar a bola no buraco com o menor número de tacadas','Acertar a bola na cesta','Passar a bola por cima da rede'], correta:1 },
+      { enunciado:'Na sinuca, o jogador usa um(a):', opcoes:['Raquete','Taco','Bastão','Luva'], correta:1 },
+      { enunciado:'Na bocha, o objetivo é aproximar a bola de um(a):', opcoes:['Cesta','Buraco','Bolim (bola pequena)','Rede'], correta:2 },
+      { enunciado:'Qual habilidade é essencial nos esportes de precisão?', opcoes:['Velocidade máxima','Concentração e controle dos movimentos','Força bruta','Contato físico'], correta:1 },
+      { enunciado:'O tiro com arco exige que o atleta acerte:', opcoes:['Uma cesta','Um alvo fixo','Um buraco no chão','A bola do adversário'], correta:1 },
+      { enunciado:'Curiosidade: em qual desses esportes o resultado NÃO depende de força física intensa?', opcoes:['Rugby','Boliche','Basquete','Handebol'], correta:1 },
+      { enunciado:'No boliche, o objetivo é derrubar:', opcoes:['Cones','Pinos','Bolas','Bandeiras'], correta:1 },
+      { enunciado:'Qual NÃO é um objetivo dos esportes de precisão?', opcoes:['Acertar um alvo','Aproximar-se de um alvo','Invadir o campo adversário','Ter controle e concentração'], correta:2 }
+    ],
+    rede: [
+      { enunciado:'O que caracteriza os esportes de rede?', opcoes:['Times disputam o mesmo espaço','Adversários separados por uma rede','Acertar um alvo fixo','Medir tempo ou distância'], correta:1 },
+      { enunciado:'Qual NÃO é um esporte de rede?', opcoes:['Vôlei','Tênis','Badminton','Rugby'], correta:3 },
+      { enunciado:'No vôlei, o fundamento que inicia o ponto é:', opcoes:['Recepção','Levantamento','Saque','Bloqueio'], correta:2 },
+      { enunciado:'No tênis, os jogadores usam:', opcoes:['Bastão','Raquete','Taco','Luva'], correta:1 },
+      { enunciado:'No badminton, o objeto usado no lugar da bola é:', opcoes:['Disco','Peteca (volante)','Bolim','Bumerangue'], correta:1 },
+      { enunciado:'Qual é o principal objetivo dos esportes de rede?', opcoes:['Marcar gols no campo adversário','Fazer a bola tocar o chão do adversário ou provocar erro','Acertar um alvo fixo','Ser o mais rápido possível'], correta:1 },
+      { enunciado:'No vôlei, quantos toques cada equipe pode dar antes de enviar a bola ao outro lado (sem contar o bloqueio)?', opcoes:['1','2','3','4'], correta:2 },
+      { enunciado:'O futevôlei combina elementos de futebol e:', opcoes:['Basquete','Vôlei','Tênis','Handebol'], correta:1 },
+      { enunciado:'Curiosidade: em qual esporte de rede o contato físico direto entre adversários NÃO ocorre?', opcoes:['Futebol','Basquete','Vôlei','Rugby'], correta:2 },
+      { enunciado:'Nos esportes de rede, o ponto também pode ser feito quando o adversário:', opcoes:['Marca um gol contra','Erra a devolução da bola','Chega primeiro na linha','Levanta o braço'], correta:1 }
+    ],
+    combinatorio: [
+      { enunciado:'O que caracteriza os esportes técnico-combinatórios?', opcoes:['Times disputam a posse de bola','Sequências de movimentos com fluidez, controle e ritmo','Acertar um alvo fixo','Separação por uma rede'], correta:1 },
+      { enunciado:'Qual é um exemplo de esporte técnico-combinatório?', opcoes:['Rugby','Ginástica Artística','Handebol','Golfe'], correta:1 },
+      { enunciado:'Nesses esportes, a avaliação do desempenho é feita por:', opcoes:['Árbitro com apito','Juízes','Cronômetro','Placar eletrônico'], correta:1 },
+      { enunciado:'O skate é considerado técnico-combinatório porque exige:', opcoes:['Marcar pontos no gol','Execução de manobras com equilíbrio e estilo','Acertar alvos fixos','Rede separando adversários'], correta:1 },
+      { enunciado:'Qual dessas modalidades também é técnico-combinatória?', opcoes:['Patinação Artística','Vôlei','Basquete','Sinuca'], correta:0 },
+      { enunciado:'Nos esportes técnico-combinatórios, geralmente NÃO existe(m):', opcoes:['Nota dos juízes','Duas equipes disputando o mesmo espaço','Sequência de movimentos','Tempo de apresentação'], correta:1 },
+      { enunciado:'Qual elemento costuma ser avaliado na ginástica artística?', opcoes:['Número de gols','Elementos acrobáticos e flexibilidade','Precisão no alvo','Posse de bola'], correta:1 },
+      { enunciado:'Curiosidade: o nado sincronizado combina técnica aquática com:', opcoes:['Elementos de dança e coreografia','Marcação de gols','Rede divisória','Cestas de pontuação'], correta:0 },
+      { enunciado:'Nesses esportes, o tempo de apresentação costuma ser:', opcoes:['Ilimitado','Livre, sem nenhuma regra','Limitado por regulamento','Determinado pelo adversário'], correta:2 },
+      { enunciado:'Qual característica NÃO pertence aos esportes técnico-combinatórios?', opcoes:['Fluidez de movimentos','Avaliação por juízes','Disputa de posse de bola entre duas equipes','Execução de elementos técnicos'], correta:2 }
+    ]
+  };
+
+  const gridCategoriasCorrida = document.getElementById('grid-categorias-corrida');
+  const pistaCorridaEl = document.getElementById('pista-corrida');
+  const peaoCorridaEl = document.getElementById('peao-corrida');
+  const peaoComputadorEl = document.getElementById('peao-computador');
+  const dadoCorridaEl = document.getElementById('dado-corrida');
+  const turnoCorridaEl = document.getElementById('turno-corrida');
+  const overlayPerguntaCorrida = document.getElementById('overlay-pergunta-corrida');
+  const categoriaPerguntaCorridaEl = document.getElementById('categoria-pergunta-corrida');
+  const enunciadoCorridaEl = document.getElementById('enunciado-corrida');
+  const opcoesCorridaEl = document.getElementById('opcoes-corrida');
+  const feedbackCorridaEl = document.getElementById('feedback-corrida');
+
+  const painelCategoriaCorrida = document.getElementById('painel-categoria-corrida');
+  const painelCasaCorrida = document.getElementById('painel-casa-corrida');
+  const painelCasaComputadorCorrida = document.getElementById('painel-casa-computador-corrida');
+  const painelJogadasCorrida = document.getElementById('painel-jogadas-corrida');
+  const painelAcertosCorrida = document.getElementById('painel-acertos-corrida');
+  const painelErrosCorrida = document.getElementById('painel-erros-corrida');
+  const painelAproveitamentoCorrida = document.getElementById('painel-aproveitamento-corrida');
+
+  const medalhaVitoriaCorridaEl = document.getElementById('medalha-vitoria-corrida');
+  const tituloVitoriaCorridaEl = document.getElementById('titulo-vitoria-corrida');
+  const statsVitoriaCorridaEl = document.getElementById('stats-vitoria-corrida');
+
+  const TOTAL_CASAS_CORRIDA = 30;
+  const PIPS_DADO = {
+    1:[4], 2:[2,6], 3:[2,4,6], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
+  };
+  const CHANCE_ACERTO_COMPUTADOR = 0.65; // probabilidade do computador acertar uma pergunta
+
+  let corridaCategoriaAtual = null;
+  let jogadorCasa = 1;
+  let computadorCasa = 1;
+  let corridaCasasPergunta = new Set();
+  let corridaPerguntasUsadas = new Set();
+  let corridaJogadas = 0;
+  let corridaAcertos = 0;
+  let corridaErros = 0;
+  let corridaRolando = false;
+  let corridaAguardandoPergunta = false;
+  let corridaAtiva = false;
+  let corridaInicioTempo = 0;
+  let turnoAtual = 'jogador';
+
+  // Monta os cartões de categoria da tela inicial da corrida
+  Object.keys(CATEGORY_INFO).forEach((chave, i) => {
+    const info = CATEGORY_INFO[chave];
+    const btn = document.createElement('button');
+    btn.className = `cat-card ${info.cor}`;
+    btn.innerHTML = `
+      <div class="cat-numero">0${i+1}</div>
+      <div class="cat-nome">${info.nome}</div>
+    `;
+    btn.addEventListener('click', () => iniciarCorrida(chave));
+    gridCategoriasCorrida.appendChild(btn);
+  });
+
+  // Posiciona as 30 casas ao redor de uma pista oval (elipse), começando no topo (largada/chegada)
+  function posicaoPercentualCasa(indice){
+    const angulo = (indice / TOTAL_CASAS_CORRIDA) * Math.PI * 2 - Math.PI / 2;
+    const raioX = 38, raioY = 33;
+    return {
+      left: 50 + raioX * Math.cos(angulo),
+      top: 50 + raioY * Math.sin(angulo)
+    };
+  }
+
+  function sortearCasasPergunta(){
+    const disponiveis = [];
+    for(let i = 2; i <= 29; i++) disponiveis.push(i);
+    for(let i = disponiveis.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [disponiveis[i], disponiveis[j]] = [disponiveis[j], disponiveis[i]];
+    }
+    return new Set(disponiveis.slice(0, 10));
+  }
+
+  function renderizarPista(){
+    pistaCorridaEl.querySelectorAll('.casa-pista').forEach(el => el.remove());
+    for(let casa = 1; casa <= TOTAL_CASAS_CORRIDA; casa++){
+      const pos = posicaoPercentualCasa(casa - 1);
+      const div = document.createElement('div');
+      div.className = 'casa-pista';
+      if(casa === 1) div.classList.add('largada');
+      if(casa === TOTAL_CASAS_CORRIDA) div.classList.add('chegada');
+      if(corridaCasasPergunta.has(casa)) div.classList.add('pergunta');
+      div.style.left = pos.left + '%';
+      div.style.top = pos.top + '%';
+      div.innerHTML = `<span>${casa}</span>`;
+      pistaCorridaEl.appendChild(div);
+    }
+    atualizarPosicaoToken('jogador');
+    atualizarPosicaoToken('computador');
+  }
+
+  // Estado de cada "peão" (jogador humano ou computador), incluindo um pequeno
+  // deslocamento para que os dois fiquem visíveis mesmo quando na mesma casa.
+  function estadoTurno(id){
+    if(id === 'jogador'){
+      return {
+        getCasa: () => jogadorCasa,
+        setCasa: (v) => { jogadorCasa = v; },
+        elemento: peaoCorridaEl,
+        offsetX: -2.5, offsetY: -2.5
+      };
+    }
+    return {
+      getCasa: () => computadorCasa,
+      setCasa: (v) => { computadorCasa = v; },
+      elemento: peaoComputadorEl,
+      offsetX: 2.5, offsetY: 2.5
+    };
+  }
+
+  function atualizarPosicaoToken(id){
+    const est = estadoTurno(id);
+    const pos = posicaoPercentualCasa(est.getCasa() - 1);
+    est.elemento.style.left = (pos.left + est.offsetX) + '%';
+    est.elemento.style.top = (pos.top + est.offsetY) + '%';
+  }
+
+  function atualizarPainelCorrida(){
+    painelCasaCorrida.textContent = jogadorCasa;
+    painelCasaComputadorCorrida.textContent = computadorCasa;
+    painelJogadasCorrida.textContent = corridaJogadas;
+    painelAcertosCorrida.textContent = corridaAcertos;
+    painelErrosCorrida.textContent = corridaErros;
+    const total = corridaAcertos + corridaErros;
+    const aproveitamento = total > 0 ? Math.round((corridaAcertos/total)*100) : 0;
+    painelAproveitamentoCorrida.textContent = aproveitamento + '%';
+  }
+
+  function renderizarPips(valor){
+    const pips = dadoCorridaEl.querySelectorAll('.pip-dado');
+    pips.forEach(p => p.classList.remove('ativo'));
+    (PIPS_DADO[valor] || []).forEach(i => pips[i].classList.add('ativo'));
+  }
+
+  function atualizarTextoTurno(){
+    if(turnoAtual === 'jogador'){
+      turnoCorridaEl.textContent = 'Sua vez! 🎲';
+      turnoCorridaEl.classList.remove('vez-computador');
+      dadoCorridaEl.classList.remove('desabilitado');
+    } else {
+      turnoCorridaEl.textContent = '🤖 Vez do computador...';
+      turnoCorridaEl.classList.add('vez-computador');
+      dadoCorridaEl.classList.add('desabilitado');
+    }
+  }
+
+  function iniciarCorrida(chaveCategoria){
+    corridaCategoriaAtual = chaveCategoria;
+    jogadorCasa = 1;
+    computadorCasa = 1;
+    corridaJogadas = 0;
+    corridaAcertos = 0;
+    corridaErros = 0;
+    corridaRolando = false;
+    corridaAguardandoPergunta = false;
+    corridaAtiva = true;
+    turnoAtual = 'jogador';
+    corridaPerguntasUsadas = new Set();
+    corridaCasasPergunta = sortearCasasPergunta();
+    corridaInicioTempo = Date.now();
+
+    painelCategoriaCorrida.textContent = CATEGORY_INFO[chaveCategoria].nome;
+    document.documentElement.style.setProperty('--card-cor', CATEGORY_INFO[chaveCategoria].corHex);
+    renderizarPista();
+    renderizarPips(1);
+    atualizarPainelCorrida();
+    atualizarTextoTurno();
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-corrida-jogo').classList.remove('escondido');
+  }
+
+  dadoCorridaEl.addEventListener('click', () => {
+    if(turnoAtual !== 'jogador' || corridaRolando || corridaAguardandoPergunta || !corridaAtiva) return;
+    corridaRolando = true;
+    dadoCorridaEl.classList.add('rolando');
+    tocarSomDado();
+
+    let contagem = 0;
+    const intervaloRolagem = setInterval(() => {
+      renderizarPips(1 + Math.floor(Math.random()*6));
+      contagem++;
+      if(contagem > 8){
+        clearInterval(intervaloRolagem);
+        const valorFinal = 1 + Math.floor(Math.random()*6);
+        renderizarPips(valorFinal);
+        dadoCorridaEl.classList.remove('rolando');
+        corridaJogadas++;
+        atualizarPainelCorrida();
+        moverPeao('jogador', valorFinal, true, () => passarTurnoParaComputador());
+      }
+    }, 70);
+  });
+
+  function moverPeao(id, passos, permitirPergunta, aoFinalizar){
+    const est = estadoTurno(id);
+    let restante = passos;
+    const direcao = passos >= 0 ? 1 : -1;
+    const passoUnico = () => {
+      if(!corridaAtiva) return;
+      if(restante === 0){
+        if(est.getCasa() >= TOTAL_CASAS_CORRIDA){
+          est.setCasa(TOTAL_CASAS_CORRIDA);
+          atualizarPosicaoToken(id);
+          atualizarPainelCorrida();
+          setTimeout(() => finalizarPartidaCorrida(id), 400);
+          return;
+        }
+        atualizarPainelCorrida();
+        if(permitirPergunta && corridaCasasPergunta.has(est.getCasa())){
+          if(id === 'jogador') abrirPerguntaCorrida();
+          else resolverPerguntaComputador(aoFinalizar);
+        } else if(aoFinalizar){
+          aoFinalizar();
+        }
+        return;
+      }
+      let novaCasa = est.getCasa() + direcao;
+      if(novaCasa < 1) novaCasa = 1;
+      est.setCasa(novaCasa);
+      if(novaCasa >= TOTAL_CASAS_CORRIDA){
+        est.setCasa(TOTAL_CASAS_CORRIDA);
+        atualizarPosicaoToken(id);
+        tocarSomMovimento();
+        setTimeout(() => { atualizarPainelCorrida(); setTimeout(() => finalizarPartidaCorrida(id), 400); }, 300);
+        return;
+      }
+      atualizarPosicaoToken(id);
+      tocarSomMovimento();
+      restante -= direcao;
+      setTimeout(passoUnico, 260);
+    };
+    passoUnico();
+  }
+
+  function abrirPerguntaCorrida(){
+    corridaAguardandoPergunta = true;
+    const perguntas = BANCO_PERGUNTAS_CORRIDA[corridaCategoriaAtual];
+    const indicesDisponiveis = perguntas.map((_, i) => i).filter(i => !corridaPerguntasUsadas.has(i));
+    const indiceEscolhido = indicesDisponiveis[Math.floor(Math.random() * indicesDisponiveis.length)];
+    corridaPerguntasUsadas.add(indiceEscolhido);
+    const pergunta = perguntas[indiceEscolhido];
+
+    categoriaPerguntaCorridaEl.textContent = CATEGORY_INFO[corridaCategoriaAtual].nome;
+    enunciadoCorridaEl.textContent = pergunta.enunciado;
+    feedbackCorridaEl.textContent = '';
+    feedbackCorridaEl.className = 'feedback-corrida';
+    opcoesCorridaEl.innerHTML = '';
+
+    const letras = ['A', 'B', 'C', 'D'];
+    pergunta.opcoes.forEach((opcao, indice) => {
+      const btn = document.createElement('button');
+      btn.className = 'opcao-corrida';
+      btn.innerHTML = `<b>${letras[indice]}</b>${opcao}`;
+      btn.addEventListener('click', () => responderPerguntaCorrida(btn, indice === pergunta.correta, pergunta));
+      opcoesCorridaEl.appendChild(btn);
+    });
+
+    overlayPerguntaCorrida.classList.remove('escondido');
+  }
+
+  function responderPerguntaCorrida(botaoClicado, acertou, pergunta){
+    const botoes = opcoesCorridaEl.querySelectorAll('.opcao-corrida');
+    botoes.forEach(b => b.disabled = true);
+    botoes[pergunta.correta].classList.add('correta');
+
+    if(acertou){
+      botaoClicado.classList.add('correta');
+      feedbackCorridaEl.textContent = '✅ Resposta correta!';
+      feedbackCorridaEl.classList.add('acerto');
+      corridaAcertos++;
+      tocarSomAcerto();
+    } else {
+      botaoClicado.classList.add('incorreta');
+      feedbackCorridaEl.textContent = `❌ Resposta incorreta. A resposta correta era: ${pergunta.opcoes[pergunta.correta]}`;
+      feedbackCorridaEl.classList.add('erro');
+      corridaErros++;
+      tocarSomErro();
+    }
+    atualizarPainelCorrida();
+
+    setTimeout(() => {
+      overlayPerguntaCorrida.classList.add('escondido');
+      corridaAguardandoPergunta = false;
+      if(!corridaAtiva) return;
+      const passos = acertou ? 2 : -3;
+      moverPeao('jogador', passos, false, () => passarTurnoParaComputador());
+    }, 2000);
+  }
+
+  function passarTurnoParaComputador(){
+    if(!corridaAtiva) return;
+    turnoAtual = 'computador';
+    atualizarTextoTurno();
+    setTimeout(jogadaComputador, 800);
+  }
+
+  function jogadaComputador(){
+    if(!corridaAtiva) return;
+    corridaRolando = true;
+    dadoCorridaEl.classList.add('rolando');
+    tocarSomDado();
+
+    let contagem = 0;
+    const intervaloRolagem = setInterval(() => {
+      renderizarPips(1 + Math.floor(Math.random()*6));
+      contagem++;
+      if(contagem > 8){
+        clearInterval(intervaloRolagem);
+        const valorFinal = 1 + Math.floor(Math.random()*6);
+        renderizarPips(valorFinal);
+        dadoCorridaEl.classList.remove('rolando');
+        moverPeao('computador', valorFinal, true, () => voltarTurnoParaJogador());
+      }
+    }, 70);
+  }
+
+  function resolverPerguntaComputador(aoFinalizar){
+    turnoCorridaEl.textContent = '🤖 O computador está pensando...';
+    setTimeout(() => {
+      if(!corridaAtiva) return;
+      const acertouComputador = Math.random() < CHANCE_ACERTO_COMPUTADOR;
+      if(acertouComputador){
+        turnoCorridaEl.textContent = '🤖 O computador acertou a pergunta!';
+        tocarSomAcerto();
+      } else {
+        turnoCorridaEl.textContent = '🤖 O computador errou a pergunta.';
+        tocarSomErro();
+      }
+      setTimeout(() => {
+        if(!corridaAtiva) return;
+        const passos = acertouComputador ? 2 : -3;
+        moverPeao('computador', passos, false, aoFinalizar);
+      }, 1200);
+    }, 900);
+  }
+
+  function voltarTurnoParaJogador(){
+    if(!corridaAtiva) return;
+    turnoAtual = 'jogador';
+    corridaRolando = false;
+    atualizarTextoTurno();
+  }
+
+  function dispararConfetti(){
+    const cores = ['#f2a93b', '#4caf50', '#2f6fed', '#d64545', '#7d3fd1', '#ffffff'];
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    for(let i = 0; i < 50; i++){
+      const c = document.createElement('div');
+      c.className = 'confete';
+      c.style.left = Math.random()*100 + '%';
+      c.style.background = cores[Math.floor(Math.random()*cores.length)];
+      c.style.animationDuration = (2 + Math.random()*2) + 's';
+      c.style.animationDelay = (Math.random()*0.6) + 's';
+      container.appendChild(c);
+    }
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 4500);
+  }
+
+  function finalizarPartidaCorrida(vencedorId){
+    if(!corridaAtiva && vencedorId === undefined) return;
+    corridaAtiva = false;
+    tocarSomVitoria();
+    dispararConfetti();
+
+    const totalRespostas = corridaAcertos + corridaErros;
+    const aproveitamento = totalRespostas > 0 ? Math.round((corridaAcertos/totalRespostas)*100) : 0;
+    const tempoMs = Date.now() - corridaInicioTempo;
+    const minutos = Math.floor(tempoMs / 60000);
+    const segundos = Math.floor((tempoMs % 60000) / 1000);
+    const tempoFormatado = `${minutos}:${segundos.toString().padStart(2,'0')}`;
+
+    let medalha, nomeMedalha;
+    if(vencedorId === 'jogador'){
+      medalha = '🏅'; nomeMedalha = 'Continue praticando!';
+      if(aproveitamento >= 90){ medalha = '🥇'; nomeMedalha = 'Medalha de Ouro!'; }
+      else if(aproveitamento >= 70){ medalha = '🥈'; nomeMedalha = 'Medalha de Prata!'; }
+      else if(aproveitamento >= 50){ medalha = '🥉'; nomeMedalha = 'Medalha de Bronze!'; }
+      tituloVitoriaCorridaEl.textContent = `🏆 Campeão, ${nomeAluno}! ${nomeMedalha}`;
+    } else {
+      medalha = '🤖';
+      tituloVitoriaCorridaEl.textContent = `🤖 O computador chegou primeiro! Tente de novo, ${nomeAluno}.`;
+    }
+    medalhaVitoriaCorridaEl.textContent = medalha;
+
+    statsVitoriaCorridaEl.innerHTML = `
+      <div>Categoria: <b>${CATEGORY_INFO[corridaCategoriaAtual].nome}</b></div>
+      <div>Turma: <b>${turmaAluno}</b></div>
+      <div>Sua casa final: <b>${jogadorCasa}</b></div>
+      <div>Casa do computador: <b>${computadorCasa}</b></div>
+      <div>Jogadas: <b>${corridaJogadas}</b></div>
+      <div>Tempo: <b>${tempoFormatado}</b></div>
+      <div>Acertos: <b>${corridaAcertos}</b></div>
+      <div>Erros: <b>${corridaErros}</b></div>
+      <div>Aproveitamento: <b>${aproveitamento}%</b></div>
+    `;
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-corrida').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-som-efeitos-corrida').addEventListener('click', (ev) => {
+    efeitosSonorosAtivos = !efeitosSonorosAtivos;
+    ev.target.textContent = efeitosSonorosAtivos ? '🔊 Efeitos' : '🔇 Efeitos';
+  });
+  document.getElementById('btn-voltar-menu-6').addEventListener('click', () => { corridaAtiva = false; });
+
+  document.getElementById('btn-corrida-de-novo').addEventListener('click', () => iniciarCorrida(corridaCategoriaAtual));
+  document.getElementById('btn-corrida-outra-categoria').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-corrida-intro').classList.remove('escondido');
+  });
+
+})();
+</script>
+
+</body>
+</html>
