@@ -780,7 +780,7 @@
   <section id="tela-hub" class="escondido">
     <div class="crachá-aluno" id="crachá-aluno-hub"></div>
     <h1 class="titulo-jogo-entrada">O que você quer acessar?</h1>
-    <div class="grid-menu" style="max-width:520px;">
+    <div class="grid-menu" style="max-width:520px; grid-template-columns: repeat(2, minmax(150px, 1fr)); margin: 0 auto;">
       <button class="jogo-card j1" id="btn-hub-jogos">
         <span class="emoji">🎮</span>
         <div class="jogo-nome">Jogos</div>
@@ -1119,15 +1119,15 @@
   let efeitosSonorosAtivos = true;
   let musicaTimerId = null;
   let musicaPasso = 0;
+  let estiloMusicaAtual = 'lofi'; // 'lofi' (início) | 'chilltrap' (conteúdo) | 'synthretro' (jogos)
+  let noiseBufferMusica = null;
 
-  // Melodia animada e saltitante (Dó maior), com variações de ritmo e um contorno mais vivo
-  const PADRAO_MUSICA = [
-    523.25, 659.25, 783.99, 659.25, 523.25, null, 659.25, 783.99,
-    880.00, 783.99, 659.25, null, 587.33, 739.99, 880.00, 739.99,
-    587.33, null, 739.99, 880.00, 987.77, 880.00, 739.99, null,
-    523.25, 783.99, 659.25, 523.25, null, 659.25, 783.99, 1046.50,
-    880.00, 783.99, 659.25, 587.33, null, 523.25, 659.25, 783.99
-  ];
+  // Progressões de acordes/graves de cada estilo
+  const PROGRESSAO_LOFI = [261.63, 220.00, 246.94, 196.00];
+  const ACORDES_LOFI = PROGRESSAO_LOFI.map(f => [f, f*1.25, f*1.5]);
+  const BAIXOS_CHILLTRAP = [82.41, 73.42, 87.31, 98.00];
+  const PROGRESSAO_SYNTHRETRO = [220.00, 261.63, 293.66, 246.94];
+  const ARPEJOS_SYNTHRETRO = PROGRESSAO_SYNTHRETRO.map(f => [f, f*1.5, f*2, f*1.5]);
 
   function garantirAudioContext(){
     if(!audioCtx){
@@ -1156,17 +1156,103 @@
     osc.stop(inicio + duracao + 0.02);
   }
 
+  function tocarKickMusica(volume){
+    const ctx = garantirAudioContext();
+    if(!ctx) return;
+    const inicio = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(120, inicio);
+    osc.frequency.exponentialRampToValueAtTime(40, inicio + 0.15);
+    gain.gain.setValueAtTime(volume, inicio);
+    gain.gain.exponentialRampToValueAtTime(0.001, inicio + 0.2);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(inicio);
+    osc.stop(inicio + 0.22);
+  }
+
+  function criarRuidoMusica(ctx){
+    const dur = 0.3;
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    return buffer;
+  }
+
+  function tocarRuidoMusica(volume, duracao, filtroFreq){
+    const ctx = garantirAudioContext();
+    if(!ctx) return;
+    if(!noiseBufferMusica) noiseBufferMusica = criarRuidoMusica(ctx);
+    const inicio = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = noiseBufferMusica;
+    const filtro = ctx.createBiquadFilter();
+    filtro.type = 'highpass';
+    filtro.frequency.value = filtroFreq || 4000;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(volume, inicio);
+    gain.gain.exponentialRampToValueAtTime(0.001, inicio + duracao);
+    src.connect(filtro);
+    filtro.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(inicio);
+    src.stop(inicio + duracao + 0.02);
+  }
+
+  function passoLoFi(passo){
+    const passoNoCompasso = passo % 8;
+    const acorde = ACORDES_LOFI[Math.floor(passo / 8) % ACORDES_LOFI.length];
+    if(passoNoCompasso === 0 || passoNoCompasso === 4) tocarKickMusica(0.02);
+    if(passoNoCompasso === 2 || passoNoCompasso === 6) tocarRuidoMusica(0.016, 0.15, 2500);
+    if(passoNoCompasso === 0) acorde.forEach((f, j) => tocarNota(f, 1.1, 'sine', 0.012, j * 0.02));
+  }
+
+  function passoChillTrap(passo){
+    const p = passo % 16;
+    const baixo = BAIXOS_CHILLTRAP[Math.floor(passo / 16) % BAIXOS_CHILLTRAP.length];
+    if(p === 0) tocarNota(baixo, 0.35, 'sine', 0.014);
+    if(p === 0 || p === 8) tocarKickMusica(0.018);
+    if(p === 4 || p === 12) tocarRuidoMusica(0.015, 0.12, 3000);
+    if(p % 2 === 0) tocarRuidoMusica(0.007, 0.05, 7000);
+  }
+
+  function passoSynthRetro(passo){
+    const passoNoCompasso = passo % 8;
+    const acorde = ARPEJOS_SYNTHRETRO[Math.floor(passo / 8) % ARPEJOS_SYNTHRETRO.length];
+    if(passoNoCompasso % 4 === 0) tocarKickMusica(0.02);
+    tocarNota(acorde[passoNoCompasso % acorde.length], 0.4, 'sawtooth', 0.012);
+  }
+
+  function intervaloDoEstiloMusica(){
+    if(estiloMusicaAtual === 'lofi') return 220;
+    if(estiloMusicaAtual === 'chilltrap') return 130;
+    return 200;
+  }
+
   function passoMusica(){
     if(!musicaAtiva) return;
-    const freq = PADRAO_MUSICA[musicaPasso % PADRAO_MUSICA.length];
-    if(freq){ tocarNota(freq, 0.2, 'triangle', 0.014); }
+    if(estiloMusicaAtual === 'lofi') passoLoFi(musicaPasso);
+    else if(estiloMusicaAtual === 'chilltrap') passoChillTrap(musicaPasso);
+    else passoSynthRetro(musicaPasso);
     musicaPasso++;
+  }
+
+  function definirEstiloMusica(estilo){
+    if(estiloMusicaAtual === estilo) return;
+    estiloMusicaAtual = estilo;
+    musicaPasso = 0;
+    if(musicaTimerId){
+      clearInterval(musicaTimerId);
+      musicaTimerId = setInterval(passoMusica, intervaloDoEstiloMusica());
+    }
   }
 
   function iniciarMusica(){
     garantirAudioContext();
     if(musicaTimerId) return;
-    musicaTimerId = setInterval(passoMusica, 150);
+    musicaTimerId = setInterval(passoMusica, intervaloDoEstiloMusica());
   }
 
   function pararMusica(){
@@ -1680,6 +1766,7 @@
   }
 
   function mostrarConteudoCategoria(chaveCategoria){
+    definirEstiloMusica('chilltrap');
     const info = CATEGORY_INFO[chaveCategoria];
     const dados = CONTEUDO_ESPORTES[chaveCategoria];
     tituloConteudoDetalhe.textContent = info.nome;
@@ -1755,11 +1842,13 @@
   }
 
   function irParaHub(){
+    definirEstiloMusica('lofi');
     esconderTodasAsTelas();
     document.getElementById('tela-hub').classList.remove('escondido');
   }
 
   function irParaMenu(){
+    definirEstiloMusica('synthretro');
     esconderTodasAsTelas();
     telaMenu.classList.remove('escondido');
   }
@@ -1784,6 +1873,7 @@
 
   document.getElementById('btn-hub-jogos').addEventListener('click', irParaMenu);
   document.getElementById('btn-hub-conteudo').addEventListener('click', () => {
+    definirEstiloMusica('chilltrap');
     esconderTodasAsTelas();
     document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
   });
@@ -3132,21 +3222,34 @@
   document.getElementById('nav-hub').addEventListener('click', () => navegarPara(irParaHub));
   document.getElementById('nav-menu-jogos').addEventListener('click', () => navegarPara(irParaMenu));
   document.getElementById('nav-jogo-memoria').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
     esconderTodasAsTelas();
     document.getElementById('tela-inicial').classList.remove('escondido');
   }));
-  document.getElementById('nav-jogo-classificando').addEventListener('click', () => navegarPara(iniciarClassificando));
+  document.getElementById('nav-jogo-classificando').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
+    iniciarClassificando();
+  }));
   document.getElementById('nav-jogo-quiz').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
     esconderTodasAsTelas();
     document.getElementById('tela-quiz-categorias').classList.remove('escondido');
   }));
-  document.getElementById('nav-jogo-cruzadas').addEventListener('click', () => navegarPara(iniciarCruzadas));
-  document.getElementById('nav-jogo-caca').addEventListener('click', () => navegarPara(iniciarCaca));
+  document.getElementById('nav-jogo-cruzadas').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
+    iniciarCruzadas();
+  }));
+  document.getElementById('nav-jogo-caca').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
+    iniciarCaca();
+  }));
   document.getElementById('nav-jogo-corrida').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
     esconderTodasAsTelas();
     document.getElementById('tela-corrida-intro').classList.remove('escondido');
   }));
   document.getElementById('nav-conteudo-categorias').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('chilltrap');
     esconderTodasAsTelas();
     document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
   }));
