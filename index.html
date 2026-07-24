@@ -131,6 +131,56 @@
   .crachá-aluno b{ color: var(--dourado); }
 
   /* ---------- MENU DE JOGOS ---------- */
+  .cartao-conteudo{
+    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    padding: 28px 26px; max-width: 640px; width:100%; margin: 0 auto;
+  }
+  .cartao-conteudo h2{
+    font-family: var(--fonte-titulo); color: var(--dourado); margin: 0 0 14px;
+    font-size: clamp(19px, 4vw, 25px);
+  }
+  .cartao-conteudo p{ font-size: 14.5px; line-height:1.6; opacity:0.95; margin: 0 0 20px; }
+  .cartao-conteudo h3{
+    font-size: 13px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado);
+    margin: 0 0 12px;
+  }
+  .grid-exemplos-conteudo{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px;
+  }
+  .exemplo-conteudo-item{
+    background: var(--giz); border-radius: 10px; padding: 10px 6px; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    cursor:pointer; border: 3px solid transparent; transition: transform .12s ease, border-color .12s ease;
+  }
+  .exemplo-conteudo-item:hover{ transform: translateY(-3px); }
+  .exemplo-conteudo-item.selecionado{ border-color: var(--dourado); }
+  .exemplo-conteudo-item .icone{ width: 40px; }
+  .exemplo-conteudo-item .icone svg{ width:100%; height:auto; display:block; }
+  .exemplo-conteudo-item .nome{
+    font-size: 10.5px; font-weight:800; color: var(--quadra-escura); text-transform:uppercase;
+  }
+  .abas-conteudo{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .aba-conteudo{
+    background: rgba(244,239,225,0.08); border: 1px solid var(--linha); color: var(--giz);
+    padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight:700; cursor:pointer;
+    font-family: var(--fonte-corpo);
+  }
+  .aba-conteudo.ativa{ background: rgba(242,169,59,0.2); border-color: var(--dourado); color: var(--dourado); }
+  #texto-conteudo-detalhe{ margin-bottom: 20px; }
+  #texto-conteudo-detalhe p{ font-size: 14.5px; line-height:1.6; opacity:0.95; margin:0; }
+  .lista-caracteristicas{ margin:0; padding-left: 20px; font-size: 14px; line-height:1.8; opacity:0.95; }
+  .descricao-exemplo-conteudo{
+    margin-top:14px; font-size:13.5px; line-height:1.5; background: rgba(242,169,59,0.1);
+    border: 1px solid var(--dourado); border-radius:10px; padding:12px 14px; display:none;
+  }
+  .descricao-exemplo-conteudo.mostrar{ display:block; }
+  .descricao-exemplo-conteudo b{ color: var(--dourado); }
+  .tabela-conteudo{ width:100%; border-collapse: collapse; font-size: 13px; }
+  .tabela-conteudo th, .tabela-conteudo td{
+    padding: 7px 10px; border-bottom: 1px solid var(--linha); text-align:left;
+  }
+  .tabela-conteudo th{ color: var(--dourado); text-transform:uppercase; font-size: 11px; letter-spacing:0.3px; }
+  .outros-exemplos-conteudo{ font-size:12.5px; opacity:0.75; margin: 12px 0 0; font-style:italic; }
   .titulo-jogo-entrada{
     font-size: clamp(22px, 5vw, 32px); margin: 0 0 16px; text-align:center;
     font-family: var(--fonte-corpo);
@@ -618,6 +668,48 @@
     cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(2px);
   }
   .btn-musica:hover{ border-color: var(--dourado); }
+
+  .btn-menu-lateral{
+    position: fixed; top: 14px; left: 14px; z-index: 25;
+    background: rgba(0,0,0,0.35); color: var(--giz); border: 2px solid var(--linha);
+    border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight:700;
+    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(2px);
+  }
+  .btn-menu-lateral:hover{ border-color: var(--dourado); }
+
+  .overlay-sidebar{
+    position: fixed; inset:0; background: rgba(0,0,0,0.55); z-index: 34;
+    opacity:0; pointer-events:none; transition: opacity .25s ease;
+  }
+  .overlay-sidebar.aberto{ opacity:1; pointer-events:auto; }
+
+  .sidebar-navegacao{
+    position: fixed; top:0; left:0; height:100vh; width: 290px; max-width: 82vw;
+    background: var(--quadra-escura); border-right: 2px solid var(--linha);
+    z-index: 35; padding: 66px 18px 30px; overflow-y:auto;
+    transform: translateX(-105%); transition: transform .3s ease;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .sidebar-navegacao.aberto{ transform: translateX(0); }
+  .sidebar-titulo{
+    font-family: var(--fonte-titulo); color: var(--dourado); font-size:16px; margin: 0 0 14px;
+  }
+  .sidebar-navegacao h3{
+    font-size: 11px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado);
+    margin: 16px 0 6px; opacity:0.85;
+  }
+  .item-sidebar{
+    display:block; width:100%; text-align:left; background:transparent; border:none;
+    color: var(--giz); padding: 10px 12px; border-radius:8px; font-size:13.5px;
+    cursor:pointer; font-family: var(--fonte-corpo);
+  }
+  .item-sidebar:hover{ background: rgba(244,239,225,0.1); }
+  .item-sidebar.destaque{ font-weight:800; color: var(--dourado); font-size:15px; }
+  .fechar-sidebar{
+    position:absolute; top:14px; right:14px; background:transparent; border:none;
+    color: var(--giz); font-size:20px; cursor:pointer; line-height:1; padding:6px;
+  }
+  .fechar-sidebar:hover{ color: var(--dourado); }
   footer b{ color: var(--dourado); }
 
   @media (prefers-reduced-motion: reduce){ .carta-interior, .cat-card, .jogo-card, .btn{ transition:none !important; } }
@@ -626,6 +718,31 @@
 <body>
 
 <button class="btn-musica" id="btn-musica">🔊 Música</button>
+<button class="btn-menu-lateral escondido" id="btn-menu-lateral">☰ Menu</button>
+<div class="overlay-sidebar" id="overlay-sidebar"></div>
+<nav class="sidebar-navegacao" id="sidebar-navegacao">
+  <button class="fechar-sidebar" id="btn-fechar-sidebar">✕</button>
+  <h2 class="sidebar-titulo">Navegação</h2>
+
+  <button class="item-sidebar destaque" id="nav-hub">🏠 Início</button>
+
+  <h3>🎮 Jogos</h3>
+  <button class="item-sidebar" id="nav-menu-jogos">Menu de jogos</button>
+  <button class="item-sidebar" id="nav-jogo-memoria">🧠 Jogo da Memória</button>
+  <button class="item-sidebar" id="nav-jogo-classificando">🗂️ Classificando os Esportes</button>
+  <button class="item-sidebar" id="nav-jogo-quiz">❓ Acerte a Pergunta</button>
+  <button class="item-sidebar" id="nav-jogo-cruzadas">📝 Palavras Cruzadas</button>
+  <button class="item-sidebar" id="nav-jogo-caca">🔍 Caça-Palavras</button>
+  <button class="item-sidebar" id="nav-jogo-corrida">🏁 Corrida dos Campeões</button>
+
+  <h3>📚 Conteúdo</h3>
+  <button class="item-sidebar" id="nav-conteudo-categorias">Todas as categorias</button>
+  <button class="item-sidebar" id="nav-conteudo-marca">Esportes de Marca</button>
+  <button class="item-sidebar" id="nav-conteudo-invasao">Esportes de Invasão</button>
+  <button class="item-sidebar" id="nav-conteudo-precisao">Esportes de Precisão</button>
+  <button class="item-sidebar" id="nav-conteudo-rede">Esportes de Rede</button>
+  <button class="item-sidebar" id="nav-conteudo-combinatorio">Esportes Técnico-Combinatórios</button>
+</nav>
 <div class="central-line"></div>
 <div class="central-circle"></div>
 
@@ -659,9 +776,31 @@
     </div>
   </section>
 
+  <!-- HUB: JOGOS OU CONTEÚDO -->
+  <section id="tela-hub" class="escondido">
+    <div class="crachá-aluno" id="crachá-aluno-hub"></div>
+    <h1 class="titulo-jogo-entrada">O que você quer acessar?</h1>
+    <div class="grid-menu" style="max-width:520px;">
+      <button class="jogo-card j1" id="btn-hub-jogos">
+        <span class="emoji">🎮</span>
+        <div class="jogo-nome">Jogos</div>
+        <div class="jogo-desc">Os 6 jogos educativos sobre classificação dos esportes.</div>
+      </button>
+      <button class="jogo-card j2" id="btn-hub-conteudo">
+        <span class="emoji">📚</span>
+        <div class="jogo-nome">Conteúdo</div>
+        <div class="jogo-desc">Estude o conceito e os exemplos de cada tipo de esporte.</div>
+      </button>
+    </div>
+  </section>
+
   <!-- MENU DE JOGOS -->
   <section id="tela-menu" class="escondido">
     <div class="crachá-aluno" id="crachá-aluno"></div>
+    <div class="barra-jogo" style="max-width:920px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-hub-1">Voltar</button>
+    </div>
     <p class="instrucao">Escolha um jogo para começar:</p>
     <div class="grid-menu">
       <button class="jogo-card j1" id="btn-jogo-memoria">
@@ -696,6 +835,34 @@
       </button>
     </div>
     <div class="faixa-esportes-menu" id="faixa-esportes-menu"></div>
+  </section>
+
+  <!-- CONTEÚDO: SELEÇÃO DE CATEGORIA -->
+  <section id="tela-conteudo-categorias" class="escondido">
+    <h1 class="titulo-jogo-entrada">📚 Conteúdo</h1>
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-hub-2">Voltar</button>
+    </div>
+    <p class="instrucao">Escolha um tipo de esporte para estudar:</p>
+    <div class="grid-categorias" id="grid-categorias-conteudo"></div>
+  </section>
+
+  <!-- CONTEÚDO: DETALHE DA CATEGORIA -->
+  <section id="tela-conteudo-detalhe" class="escondido">
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-conteudo-categorias">Voltar</button>
+    </div>
+    <div class="cartao-conteudo">
+      <h2 id="titulo-conteudo-detalhe"></h2>
+      <div class="abas-conteudo" id="abas-conteudo"></div>
+      <div id="texto-conteudo-detalhe"></div>
+      <h3>Exemplos <small style="opacity:0.7; text-transform:none; letter-spacing:0;">(toque para saber mais)</small></h3>
+      <div class="grid-exemplos-conteudo" id="grid-exemplos-conteudo"></div>
+      <p class="outros-exemplos-conteudo" id="outros-exemplos-conteudo"></p>
+      <div class="descricao-exemplo-conteudo" id="descricao-exemplo-conteudo"></div>
+    </div>
   </section>
 
   <!-- ===================== JOGO 1: MEMÓRIA ===================== -->
@@ -1134,7 +1301,7 @@
       cor: CATEGORY_INFO[chave].cor,
       corHex: CATEGORY_INFO[chave].corHex,
       exemplos: cartas.map(c => c.nome),
-      cartas: cartas.map(c => ({ nome: c.nome, icone: c.icone }))
+      cartas: cartas.map(c => ({ nome: c.nome, icone: c.icone, id: c.id }))
     };
   });
 
@@ -1303,7 +1470,260 @@
     ]
   };
 
-  /* ---------- ELEMENTOS COMUNS ---------- */
+  /* ---------- CONTEÚDO (categorias de esportes) ---------- */
+  const gridCategoriasConteudo = document.getElementById('grid-categorias-conteudo');
+  const tituloConteudoDetalhe = document.getElementById('titulo-conteudo-detalhe');
+  const abasConteudo = document.getElementById('abas-conteudo');
+  const textoConteudoDetalhe = document.getElementById('texto-conteudo-detalhe');
+  const gridExemplosConteudo = document.getElementById('grid-exemplos-conteudo');
+  const outrosExemplosConteudo = document.getElementById('outros-exemplos-conteudo');
+  const descricaoExemploConteudo = document.getElementById('descricao-exemplo-conteudo');
+
+  // Conteúdo didático de cada categoria, baseado no material enviado pelo professor
+  const CONTEUDO_ESPORTES = {
+    rede: {
+      conceito: 'São modalidades em que há uma rede dividindo o espaço de jogo, separando os adversários.',
+      outrosExemplos: [],
+      secoes: [
+        {
+          titulo: 'Características',
+          tipo: 'lista',
+          itens: [
+            'Quadra dividida por rede.',
+            'Objetivo: enviar a bola ao campo adversário dificultando a devolução.',
+            'Não há contato físico.'
+          ]
+        },
+        {
+          titulo: 'Fundamentos Técnicos',
+          tipo: 'lista',
+          itens: [
+            'Saque – início da jogada.',
+            'Recepção – ação de receber a bola.',
+            'Rebatida – golpear a bola para o outro lado.'
+          ]
+        },
+        {
+          titulo: 'Benefícios',
+          tipo: 'lista',
+          itens: ['Coordenação motora', 'Reflexo', 'Estratégia', 'Concentração']
+        }
+      ]
+    },
+    precisao: {
+      conceito: 'São modalidades esportivas em que o objetivo principal é acertar um alvo ou realizar uma ação com alto grau de exatidão e controle. Mais do que força ou velocidade, é fundamental ter controle motor, concentração e coordenação.',
+      outrosExemplos: ['Boliche', 'Tiro Esportivo', 'Dardos'],
+      secoes: [
+        {
+          titulo: 'Habilidades Motoras',
+          tipo: 'lista',
+          itens: ['Coordenação motora fina', 'Equilíbrio', 'Concentração', 'Controle de força', 'Percepção espacial']
+        },
+        {
+          titulo: 'Fundamentos Técnicos',
+          tipo: 'lista',
+          itens: ['Posicionamento corporal', 'Empunhadura e pegada', 'Mira e alinhamento', 'Respiração e controle emocional', 'Execução do movimento']
+        }
+      ]
+    },
+    marca: {
+      conceito: 'São os esportes onde o principal objetivo é superar uma marca individual, como tempo, distância ou altura.',
+      outrosExemplos: ['Maratona', 'Remo', 'Saltos (altura/vara)'],
+      secoes: [
+        {
+          titulo: 'Características',
+          tipo: 'lista',
+          itens: [
+            'Objetivo: superar marcas (tempo, distância, altura).',
+            'Critérios de vitória: melhores tempos, maiores distâncias, alturas superadas.',
+            'Instrumentos: cronômetros, réguas, sensores.'
+          ]
+        },
+        {
+          titulo: 'O que cada esporte mede',
+          tipo: 'tabela',
+          cabecalho: ['Esporte', 'Marca medida'],
+          itens: [
+            ['Atletismo', 'Tempo (corridas), distância (saltos e arremessos)'],
+            ['Natação', 'Tempo'],
+            ['Ciclismo', 'Tempo'],
+            ['Halterofilismo', 'Peso levantado'],
+            ['Saltos (altura/vara)', 'Altura alcançada'],
+            ['Maratona', 'Tempo'],
+            ['Remo', 'Tempo']
+          ]
+        }
+      ]
+    },
+    combinatorio: {
+      conceito: 'São modalidades que combinam elementos técnicos e estéticos, exigindo a execução de sequências de movimentos coordenados, com fluidez, precisão, controle e ritmo. Geralmente são avaliadas por juízes, que observam a execução dos movimentos, a qualidade técnica e a expressão corporal.',
+      outrosExemplos: ['Ginástica Rítmica', 'Esqui'],
+      secoes: [
+        {
+          titulo: 'Habilidades Motoras',
+          tipo: 'lista',
+          itens: ['Coordenação', 'Equilíbrio', 'Força', 'Flexibilidade', 'Agilidade', 'Ritmo e percepção espacial', 'Expressão corporal']
+        },
+        {
+          titulo: 'Regras Básicas',
+          tipo: 'lista',
+          itens: [
+            'Avaliação feita por juízes.',
+            'Penalidades por quedas, desequilíbrios, erros de técnica e saídas de área.',
+            'Tempo limite para cada apresentação.',
+            'É obrigatória a execução de elementos técnicos obrigatórios.'
+          ]
+        },
+        {
+          titulo: 'Benefícios',
+          tipo: 'lista',
+          itens: [
+            'Desenvolvem disciplina, autocontrole e concentração.',
+            'Melhoram força, resistência, flexibilidade e equilíbrio.',
+            'Estimula a expressão corporal e criatividade.',
+            'Promovem trabalho em equipe (quando em grupos) e respeito às regras.'
+          ]
+        }
+      ]
+    },
+    invasao: {
+      conceito: 'São uma categoria de atividades esportivas em que duas equipes competem para invadir o território adversário e marcar pontos. Esses esportes exigem estratégia, coordenação, habilidades físicas e trabalho em equipe.',
+      outrosExemplos: ['Futsal', 'Futebol Americano', 'Hóquei no Gelo'],
+      secoes: [
+        {
+          titulo: 'Características Gerais',
+          tipo: 'lista',
+          itens: [
+            'Presença de dois times.',
+            'Objetivo de marcar pontos no campo do adversário.',
+            'Necessidade de cooperação entre os jogadores.',
+            'Regras específicas para cada modalidade.'
+          ]
+        },
+        {
+          titulo: 'Princípios Táticos',
+          tipo: 'lista',
+          itens: [
+            'Ataque – manter a posse da bola, finalizar para marcar.',
+            'Defesa – proteger o território e evitar que o adversário pontue.',
+            'Transição – mudança entre ataque e defesa.'
+          ]
+        },
+        {
+          titulo: 'Benefícios',
+          tipo: 'lista',
+          itens: ['Desenvolvimento motor', 'Socialização e resolução de conflitos', 'Aprendizado sobre regras e disciplina']
+        }
+      ]
+    }
+  };
+
+  // Pequena descrição de cada esporte, usada quando o aluno toca em um exemplo
+  const DESCRICOES_ESPORTES = {
+    atletismo: 'Conjunto de modalidades com corridas, saltos e arremessos; é um esporte de marca.',
+    natacao: 'Esporte de marca praticado na piscina, com diferentes estilos de nado.',
+    ciclismo: 'Esporte de marca disputado sobre uma bicicleta.',
+    levantamento: 'Esporte de marca em que o atleta tenta levantar o maior peso possível em uma barra.',
+    futebol: 'Esporte de invasão jogado com os pés; o mais popular do Brasil.',
+    basquete: 'Esporte de invasão em que o objetivo é acertar a bola na cesta adversária.',
+    handebol: 'Esporte de invasão jogado com as mãos, arremessando para marcar gols.',
+    rugbi: 'Esporte de invasão jogado com uma bola oval, com passes sempre para trás.',
+    golfe: 'Esporte de precisão em que se usa um taco para colocar a bola no buraco.',
+    bocha: 'Esporte de precisão em que se arremessam bolas o mais perto possível do bolim.',
+    sinuca: 'Esporte de precisão jogado em uma mesa, usando tacos e bolas coloridas.',
+    tiro_arco: 'Esporte de precisão em que o atleta usa um arco para acertar um alvo fixo à distância.',
+    ginastica: 'Esporte técnico-combinatório que une força, flexibilidade e elementos acrobáticos.',
+    nado_sincronizado: 'Esporte técnico-combinatório que combina natação e coreografia, avaliado por juízes.',
+    skate: 'Esporte técnico-combinatório praticado sobre uma prancha com rodinhas.',
+    patinacao: 'Esporte técnico-combinatório praticado sobre patins, com giros e saltos.',
+    voleibol: 'Esporte de rede em que as equipes não podem deixar a bola cair no próprio campo.',
+    tenis: 'Esporte de rede jogado com raquetes, em quadras individuais ou em duplas.',
+    badminton: 'Esporte de rede jogado com raquetes leves e uma peteca (volante), em vez de bola.',
+    tenis_mesa: 'Esporte de rede disputado sobre uma mesa dividida por uma rede pequena, com raquetes leves.'
+  };
+
+  Object.keys(CATEGORY_INFO).forEach((chave, i) => {
+    const info = CATEGORY_INFO[chave];
+    const btn = document.createElement('button');
+    btn.className = `cat-card ${info.cor}`;
+    btn.innerHTML = `
+      <div class="cat-numero">0${i+1}</div>
+      <div class="cat-nome">${info.nome}</div>
+      <div class="cat-exemplos">${CATEGORIAS[chave].exemplos.join(' · ')}</div>
+    `;
+    btn.addEventListener('click', () => mostrarConteudoCategoria(chave));
+    gridCategoriasConteudo.appendChild(btn);
+  });
+
+  function renderizarSecaoConteudo(secao){
+    if(secao.tipo === 'lista'){
+      const itens = secao.itens.map(item => `<li>${item}</li>`).join('');
+      textoConteudoDetalhe.innerHTML = `<ul class="lista-caracteristicas">${itens}</ul>`;
+    } else if(secao.tipo === 'tabela'){
+      const linhasCabecalho = secao.cabecalho.map(c => `<th>${c}</th>`).join('');
+      const linhas = secao.itens.map(linha => `<tr>${linha.map(v => `<td>${v}</td>`).join('')}</tr>`).join('');
+      textoConteudoDetalhe.innerHTML = `<table class="tabela-conteudo"><thead><tr>${linhasCabecalho}</tr></thead><tbody>${linhas}</tbody></table>`;
+    } else {
+      textoConteudoDetalhe.innerHTML = `<p>${secao.texto}</p>`;
+    }
+  }
+
+  function renderizarAbaConteudo(chaveCategoria, indiceAba){
+    const dados = CONTEUDO_ESPORTES[chaveCategoria];
+    if(indiceAba === 0){
+      textoConteudoDetalhe.innerHTML = `<p>${dados.conceito}</p>`;
+    } else {
+      renderizarSecaoConteudo(dados.secoes[indiceAba - 1]);
+    }
+    abasConteudo.querySelectorAll('.aba-conteudo').forEach(b => b.classList.remove('ativa'));
+    abasConteudo.querySelector(`[data-aba="${indiceAba}"]`).classList.add('ativa');
+  }
+
+  function mostrarConteudoCategoria(chaveCategoria){
+    const info = CATEGORY_INFO[chaveCategoria];
+    const dados = CONTEUDO_ESPORTES[chaveCategoria];
+    tituloConteudoDetalhe.textContent = info.nome;
+
+    abasConteudo.innerHTML = '';
+    const abasDados = [{ label: '📖 Conceito' }].concat(
+      dados.secoes.map(secao => ({ label: secao.titulo }))
+    );
+    abasDados.forEach((dado, indice) => {
+      const btn = document.createElement('button');
+      btn.className = 'aba-conteudo';
+      btn.dataset.aba = indice;
+      btn.textContent = dado.label;
+      btn.addEventListener('click', () => renderizarAbaConteudo(chaveCategoria, indice));
+      abasConteudo.appendChild(btn);
+    });
+    renderizarAbaConteudo(chaveCategoria, 0);
+
+    descricaoExemploConteudo.innerHTML = '';
+    descricaoExemploConteudo.classList.remove('mostrar');
+
+    gridExemplosConteudo.innerHTML = '';
+    CATEGORIAS[chaveCategoria].cartas.forEach(carta => {
+      const div = document.createElement('div');
+      div.className = 'exemplo-conteudo-item';
+      div.innerHTML = `<div class="icone">${carta.icone}</div><div class="nome">${carta.nome}</div>`;
+      div.addEventListener('click', () => {
+        gridExemplosConteudo.querySelectorAll('.exemplo-conteudo-item').forEach(el => el.classList.remove('selecionado'));
+        div.classList.add('selecionado');
+        descricaoExemploConteudo.innerHTML = `<b>${carta.nome}:</b> ${DESCRICOES_ESPORTES[carta.id] || ''}`;
+        descricaoExemploConteudo.classList.add('mostrar');
+      });
+      gridExemplosConteudo.appendChild(div);
+    });
+
+    outrosExemplosConteudo.textContent = dados.outrosExemplos && dados.outrosExemplos.length
+      ? `Também são exemplos: ${dados.outrosExemplos.join(', ')}.`
+      : '';
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-detalhe').classList.remove('escondido');
+  }
+
+
   const telaNome = document.getElementById('tela-nome');
   const telaMenu = document.getElementById('tela-menu');
   const crachaAluno = document.getElementById('crachá-aluno');
@@ -1324,13 +1744,19 @@
   }
 
   function esconderTodasAsTelas(){
-    ['tela-nome','tela-menu','tela-inicial','tela-jogo','tela-vitoria',
+    ['tela-nome','tela-hub','tela-menu','tela-inicial','tela-jogo','tela-vitoria',
      'tela-classificar','tela-vitoria-classificar',
      'tela-quiz-categorias','tela-quiz','tela-vitoria-quiz',
      'tela-cruzadas','tela-vitoria-cruzadas',
      'tela-caca','tela-vitoria-caca',
-     'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida'
+     'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida',
+     'tela-conteudo-categorias','tela-conteudo-detalhe'
     ].forEach(id => document.getElementById(id).classList.add('escondido'));
+  }
+
+  function irParaHub(){
+    esconderTodasAsTelas();
+    document.getElementById('tela-hub').classList.remove('escondido');
   }
 
   function irParaMenu(){
@@ -1348,9 +1774,24 @@
     nomeAluno = nome;
     turmaAluno = turma;
     erroIdentificacao.textContent = '';
-    crachaAluno.innerHTML = `Aluno(a): <b>${nomeAluno}</b> &nbsp;|&nbsp; Turma: <b>${turmaAluno}</b>`;
+    const crachaTexto = `Aluno(a): <b>${nomeAluno}</b> &nbsp;|&nbsp; Turma: <b>${turmaAluno}</b>`;
+    crachaAluno.innerHTML = crachaTexto;
+    document.getElementById('crachá-aluno-hub').innerHTML = crachaTexto;
     iniciarMusica();
-    irParaMenu();
+    document.getElementById('btn-menu-lateral').classList.remove('escondido');
+    irParaHub();
+  });
+
+  document.getElementById('btn-hub-jogos').addEventListener('click', irParaMenu);
+  document.getElementById('btn-hub-conteudo').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
+  });
+  document.getElementById('btn-voltar-hub-1').addEventListener('click', irParaHub);
+  document.getElementById('btn-voltar-hub-2').addEventListener('click', irParaHub);
+  document.getElementById('btn-voltar-conteudo-categorias').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
   });
 
   document.getElementById('btn-jogo-memoria').addEventListener('click', () => {
@@ -2661,6 +3102,59 @@
     esconderTodasAsTelas();
     document.getElementById('tela-corrida-intro').classList.remove('escondido');
   });
+
+  /* ===================== MENU LATERAL DE NAVEGAÇÃO ===================== */
+  const btnMenuLateral = document.getElementById('btn-menu-lateral');
+  const sidebarNavegacao = document.getElementById('sidebar-navegacao');
+  const overlaySidebar = document.getElementById('overlay-sidebar');
+  const btnFecharSidebar = document.getElementById('btn-fechar-sidebar');
+
+  function abrirSidebar(){
+    sidebarNavegacao.classList.add('aberto');
+    overlaySidebar.classList.add('aberto');
+  }
+  function fecharSidebar(){
+    sidebarNavegacao.classList.remove('aberto');
+    overlaySidebar.classList.remove('aberto');
+  }
+  btnMenuLateral.addEventListener('click', () => {
+    sidebarNavegacao.classList.contains('aberto') ? fecharSidebar() : abrirSidebar();
+  });
+  overlaySidebar.addEventListener('click', fecharSidebar);
+  btnFecharSidebar.addEventListener('click', fecharSidebar);
+
+  function navegarPara(funcao){
+    corridaAtiva = false; // interrompe com segurança uma corrida em andamento, se houver
+    fecharSidebar();
+    funcao();
+  }
+
+  document.getElementById('nav-hub').addEventListener('click', () => navegarPara(irParaHub));
+  document.getElementById('nav-menu-jogos').addEventListener('click', () => navegarPara(irParaMenu));
+  document.getElementById('nav-jogo-memoria').addEventListener('click', () => navegarPara(() => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-inicial').classList.remove('escondido');
+  }));
+  document.getElementById('nav-jogo-classificando').addEventListener('click', () => navegarPara(iniciarClassificando));
+  document.getElementById('nav-jogo-quiz').addEventListener('click', () => navegarPara(() => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-quiz-categorias').classList.remove('escondido');
+  }));
+  document.getElementById('nav-jogo-cruzadas').addEventListener('click', () => navegarPara(iniciarCruzadas));
+  document.getElementById('nav-jogo-caca').addEventListener('click', () => navegarPara(iniciarCaca));
+  document.getElementById('nav-jogo-corrida').addEventListener('click', () => navegarPara(() => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-corrida-intro').classList.remove('escondido');
+  }));
+  document.getElementById('nav-conteudo-categorias').addEventListener('click', () => navegarPara(() => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
+  }));
+  document.getElementById('nav-conteudo-marca').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('marca')));
+  document.getElementById('nav-conteudo-invasao').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('invasao')));
+  document.getElementById('nav-conteudo-precisao').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('precisao')));
+  document.getElementById('nav-conteudo-rede').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('rede')));
+  document.getElementById('nav-conteudo-combinatorio').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('combinatorio')));
 
 })();
 
