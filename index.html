@@ -36,6 +36,7 @@
     --cor-jogo4: #d1417d; --cor-jogo4-esc: #8f1f52;
     --cor-jogo5: #2f8fd1; --cor-jogo5-esc: #17547f;
     --cor-jogo6: #ff6b35; --cor-jogo6-esc: #b8431a;
+    --cor-jogo7: #6b4fd1; --cor-jogo7-esc: #3f2c8f;
 
     --fonte-titulo: 'Arial Black', 'Segoe UI Black', sans-serif;
     --fonte-corpo: 'Segoe UI', Verdana, sans-serif;
@@ -209,6 +210,7 @@
   .jogo-card.j4{ background: linear-gradient(135deg, var(--cor-jogo4), var(--cor-jogo4-esc)); }
   .jogo-card.j5{ background: linear-gradient(135deg, var(--cor-jogo5), var(--cor-jogo5-esc)); }
   .jogo-card.j6{ background: linear-gradient(135deg, var(--cor-jogo6), var(--cor-jogo6-esc)); }
+  .jogo-card.j7{ background: linear-gradient(135deg, var(--cor-jogo7), var(--cor-jogo7-esc)); }
   .jogo-card .emoji{ font-size: 40px; display:block; margin-bottom: 10px; }
   .jogo-card .jogo-nome{ font-weight:800; font-size: 17px; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
   .jogo-card .jogo-desc{ font-size: 12.5px; opacity:0.92; line-height:1.4; }
@@ -384,6 +386,40 @@
   .opcao-quiz:disabled{ cursor:default; }
   .opcao-quiz.correta{ background: rgba(76,175,80,0.25); border-color:#4caf50; }
   .opcao-quiz.incorreta{ background: rgba(214,69,69,0.25); border-color:#d64545; }
+
+  /* ---------- JOGO 7: FORCA ---------- */
+  .cartao-forca{
+    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    padding: 24px 22px; max-width: 620px; width:100%; display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+  .forca-contador{ font-size:12.5px; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; align-self:flex-start; }
+  .forca-area-principal{
+    display:flex; flex-wrap:wrap; gap:20px; align-items:center; justify-content:center; width:100%;
+  }
+  .forca-desenho{ width: 150px; height:auto; flex-shrink:0; }
+  .forca-parte{ opacity:0; transition: opacity .25s ease; }
+  .forca-parte.mostrar{ opacity:1; }
+  .forca-info{ display:flex; flex-direction:column; gap:10px; align-items:center; flex:1; min-width:200px; }
+  .forca-dica{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado); font-weight:800;
+  }
+  .forca-palavra{
+    font-family: var(--fonte-titulo); font-size: clamp(18px, 4.5vw, 28px); letter-spacing: 4px;
+    color: var(--giz); text-align:center; word-break: break-word;
+  }
+  .forca-erros{ font-size:13px; opacity:0.85; }
+  .forca-teclado{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap:6px; width:100%; max-width:480px;
+  }
+  .tecla-forca{
+    background: rgba(244,239,225,0.1); border: 2px solid var(--linha); color: var(--giz);
+    border-radius: 8px; padding: 9px 0; font-size:14px; font-weight:800; cursor:pointer;
+    font-family: var(--fonte-corpo); transition: background .15s ease, transform .1s ease;
+  }
+  .tecla-forca:hover:not(:disabled){ background: rgba(244,239,225,0.2); }
+  .tecla-forca:disabled{ cursor:default; opacity:0.4; }
+  .tecla-forca.acertou{ background: rgba(76,175,80,0.35); border-color:#4caf50; opacity:1; }
+  .tecla-forca.errou{ background: rgba(214,69,69,0.35); border-color:#d64545; opacity:1; }
 
   /* ---------- JOGO 4: PALAVRAS CRUZADAS ---------- */
   .area-cruzadas{
@@ -745,6 +781,7 @@
   <button class="item-sidebar" id="nav-jogo-cruzadas">📝 Palavras Cruzadas</button>
   <button class="item-sidebar" id="nav-jogo-caca">🔍 Caça-Palavras</button>
   <button class="item-sidebar" id="nav-jogo-corrida">🏁 Corrida dos Campeões</button>
+  <button class="item-sidebar" id="nav-jogo-forca">🔤 Jogo da Forca</button>
 
   <h3>📚 Conteúdo</h3>
   <button class="item-sidebar" id="nav-conteudo-categorias">Todas as categorias</button>
@@ -845,6 +882,11 @@
         <span class="emoji">🏁</span>
         <div class="jogo-nome">Corrida dos Campeões</div>
         <div class="jogo-desc">Jogue o dado, responda perguntas e corra até a linha de chegada.</div>
+      </button>
+      <button class="jogo-card j7" id="btn-jogo-forca">
+        <span class="emoji">🔤</span>
+        <div class="jogo-nome">Jogo da Forca</div>
+        <div class="jogo-desc">Descubra o nome do esporte antes que o boneco seja enforcado.</div>
       </button>
     </div>
     <div class="faixa-esportes-menu" id="faixa-esportes-menu"></div>
@@ -1119,6 +1161,63 @@
       <button class="btn" id="btn-corrida-de-novo">Jogar novamente</button>
       <button class="btn secundario" id="btn-corrida-outra-categoria">Outra categoria</button>
       <button class="btn secundario" id="btn-menu-6">Menu principal</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO 7: FORCA ===================== -->
+  <section id="tela-forca-categorias" class="escondido">
+    <h1 class="titulo-jogo-entrada">🔤 Jogo da Forca</h1>
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-menu-7-categorias">Voltar ao menu</button>
+    </div>
+    <p class="instrucao">Escolha uma categoria de esportes para jogar:</p>
+    <div class="grid-categorias" id="grid-categorias-forca"></div>
+  </section>
+
+  <section id="tela-forca" class="escondido">
+    <div class="barra-jogo">
+      <div class="cat-titulo" id="titulo-categoria-forca">Jogo da Forca</div>
+      <div class="placar"><span>Acertos: <b id="contador-acertos-forca">0</b>/<b id="total-palavras-forca">0</b></span></div>
+      <button class="btn secundario" id="btn-voltar-menu-7">Voltar ao menu</button>
+    </div>
+
+    <div class="cartao-forca">
+      <div class="forca-contador" id="forca-contador">Palavra 1 de 4</div>
+
+      <div class="forca-area-principal">
+        <svg viewBox="0 0 200 220" class="forca-desenho">
+          <line x1="20" y1="210" x2="140" y2="210" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
+          <line x1="50" y1="210" x2="50" y2="20" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
+          <line x1="50" y1="20" x2="130" y2="20" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
+          <line x1="130" y1="20" x2="130" y2="45" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
+          <circle id="forca-parte-1" cx="130" cy="65" r="20" fill="none" stroke="#f2a93b" stroke-width="6" class="forca-parte"/>
+          <line id="forca-parte-2" x1="130" y1="85" x2="130" y2="140" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
+          <line id="forca-parte-3" x1="130" y1="100" x2="105" y2="125" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
+          <line id="forca-parte-4" x1="130" y1="100" x2="155" y2="125" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
+          <line id="forca-parte-5" x1="130" y1="140" x2="108" y2="175" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
+          <line id="forca-parte-6" x1="130" y1="140" x2="152" y2="175" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
+        </svg>
+
+        <div class="forca-info">
+          <div class="forca-dica" id="forca-dica"></div>
+          <div class="forca-palavra" id="forca-palavra"></div>
+          <div class="forca-erros" id="forca-erros">Erros: 0/6</div>
+        </div>
+      </div>
+
+      <div class="forca-teclado" id="forca-teclado"></div>
+    </div>
+  </section>
+
+  <section id="tela-vitoria-forca" class="vitoria escondido">
+    <div class="troféu" id="trofeu-vitoria-forca">🏆</div>
+    <h2 id="titulo-vitoria-forca">Jogo finalizado!</h2>
+    <p id="texto-vitoria-forca"></p>
+    <div class="btns">
+      <button class="btn" id="btn-forca-de-novo">Jogar de novo</button>
+      <button class="btn secundario" id="btn-forca-outra-categoria">Outra categoria</button>
+      <button class="btn secundario" id="btn-menu-7">Menu principal</button>
     </div>
   </section>
 
@@ -1852,6 +1951,7 @@
      'tela-cruzadas','tela-vitoria-cruzadas',
      'tela-caca','tela-vitoria-caca',
      'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida',
+     'tela-forca-categorias','tela-forca','tela-vitoria-forca',
      'tela-conteudo-categorias','tela-conteudo-detalhe'
     ].forEach(id => document.getElementById(id).classList.add('escondido'));
   }
@@ -1913,6 +2013,10 @@
   document.getElementById('btn-jogo-corrida').addEventListener('click', () => {
     esconderTodasAsTelas();
     document.getElementById('tela-corrida-intro').classList.remove('escondido');
+  });
+  document.getElementById('btn-jogo-forca').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-forca-categorias').classList.remove('escondido');
   });
 
   document.getElementById('btn-voltar-menu-1').addEventListener('click', irParaMenu);
@@ -3208,6 +3312,169 @@
     document.getElementById('tela-corrida-intro').classList.remove('escondido');
   });
 
+  /* ===================== JOGO 7: FORCA ===================== */
+  const FORCA_PALAVRAS = {
+    marca: ['ATLETISMO', 'NATACAO', 'LEVANTAMENTO DE PESO', 'CICLISMO'],
+    invasao: ['FUTEBOL', 'BASQUETE', 'HANDEBOL', 'RUGBI'],
+    precisao: ['GOLFE', 'BOCHA', 'SINUCA', 'TIRO COM ARCO'],
+    combinatorio: ['GINASTICA ARTISTICA', 'NADO SINCRONIZADO', 'SKATE', 'PATINACAO ARTISTICA'],
+    rede: ['VOLEIBOL', 'TENIS', 'BADMINTON', 'TENIS DE MESA']
+  };
+  const FORCA_MAX_ERROS = 6;
+
+  const gridCategoriasForca = document.getElementById('grid-categorias-forca');
+  const tituloCategoriaForca = document.getElementById('titulo-categoria-forca');
+  const forcaContador = document.getElementById('forca-contador');
+  const forcaDica = document.getElementById('forca-dica');
+  const forcaPalavraEl = document.getElementById('forca-palavra');
+  const forcaErrosEl = document.getElementById('forca-erros');
+  const forcaTeclado = document.getElementById('forca-teclado');
+  const contadorAcertosForca = document.getElementById('contador-acertos-forca');
+  const totalPalavrasForca = document.getElementById('total-palavras-forca');
+  const trofeuVitoriaForca = document.getElementById('trofeu-vitoria-forca');
+  const tituloVitoriaForca = document.getElementById('titulo-vitoria-forca');
+  const textoVitoriaForca = document.getElementById('texto-vitoria-forca');
+
+  let forcaCategoriaAtual = null;
+  let forcaPalavrasRodada = [];
+  let forcaIndicePalavra = 0;
+  let forcaAcertos = 0;
+  let forcaPalavraAtual = '';
+  let forcaLetrasCertas = new Set();
+  let forcaLetrasErradas = new Set();
+  let forcaErros = 0;
+  let forcaBloqueada = false;
+
+  Object.keys(CATEGORY_INFO).forEach((chave, i) => {
+    const info = CATEGORY_INFO[chave];
+    const btn = document.createElement('button');
+    btn.className = `cat-card ${info.cor}`;
+    btn.innerHTML = `
+      <div class="cat-numero">0${i+1}</div>
+      <div class="cat-nome">${info.nome}</div>
+      <div class="cat-exemplos">${FORCA_PALAVRAS[chave].length} palavra(s)</div>
+    `;
+    btn.addEventListener('click', () => iniciarForca(chave));
+    gridCategoriasForca.appendChild(btn);
+  });
+
+  function iniciarForca(chaveCategoria){
+    forcaCategoriaAtual = chaveCategoria;
+    forcaPalavrasRodada = embaralhar(FORCA_PALAVRAS[chaveCategoria]);
+    forcaIndicePalavra = 0;
+    forcaAcertos = 0;
+    tituloCategoriaForca.textContent = `Jogo da Forca — ${CATEGORY_INFO[chaveCategoria].nome}`;
+    contadorAcertosForca.textContent = '0';
+    totalPalavrasForca.textContent = forcaPalavrasRodada.length;
+    esconderTodasAsTelas();
+    document.getElementById('tela-forca').classList.remove('escondido');
+    mostrarPalavraForca();
+  }
+
+  function mostrarPalavraForca(){
+    forcaBloqueada = false;
+    forcaPalavraAtual = forcaPalavrasRodada[forcaIndicePalavra];
+    forcaLetrasCertas = new Set();
+    forcaLetrasErradas = new Set();
+    forcaErros = 0;
+
+    forcaContador.textContent = `Palavra ${forcaIndicePalavra + 1} de ${forcaPalavrasRodada.length}`;
+    forcaDica.textContent = `Dica: ${CATEGORY_INFO[forcaCategoriaAtual].nome}`;
+    forcaErrosEl.textContent = `Erros: 0/${FORCA_MAX_ERROS}`;
+
+    document.querySelectorAll('.forca-parte').forEach(p => p.classList.remove('mostrar'));
+
+    atualizarPalavraForca();
+    montarTecladoForca();
+  }
+
+  function atualizarPalavraForca(){
+    const exibicao = forcaPalavraAtual.split('').map(ch => {
+      if(ch === ' ') return '&nbsp;&nbsp;';
+      return forcaLetrasCertas.has(ch) ? ch : '_';
+    }).join(' ');
+    forcaPalavraEl.innerHTML = exibicao;
+  }
+
+  function montarTecladoForca(){
+    forcaTeclado.innerHTML = '';
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letra => {
+      const btn = document.createElement('button');
+      btn.className = 'tecla-forca';
+      btn.textContent = letra;
+      btn.addEventListener('click', () => tentarLetraForca(letra, btn));
+      forcaTeclado.appendChild(btn);
+    });
+  }
+
+  function tentarLetraForca(letra, botao){
+    if(forcaBloqueada) return;
+    botao.disabled = true;
+
+    if(forcaPalavraAtual.includes(letra)){
+      forcaLetrasCertas.add(letra);
+      botao.classList.add('acertou');
+      tocarSomAcerto();
+      atualizarPalavraForca();
+
+      const completa = forcaPalavraAtual.split('').every(ch => ch === ' ' || forcaLetrasCertas.has(ch));
+      if(completa){
+        forcaBloqueada = true;
+        forcaAcertos++;
+        contadorAcertosForca.textContent = forcaAcertos;
+        setTimeout(avancarForca, 1200);
+      }
+    } else {
+      forcaLetrasErradas.add(letra);
+      forcaErros++;
+      botao.classList.add('errou');
+      tocarSomErro();
+      forcaErrosEl.textContent = `Erros: ${forcaErros}/${FORCA_MAX_ERROS}`;
+      const parte = document.getElementById(`forca-parte-${forcaErros}`);
+      if(parte) parte.classList.add('mostrar');
+
+      if(forcaErros >= FORCA_MAX_ERROS){
+        forcaBloqueada = true;
+        forcaLetrasCertas = new Set(forcaPalavraAtual.split(''));
+        atualizarPalavraForca();
+        document.querySelectorAll('.forca-teclado .tecla-forca').forEach(b => b.disabled = true);
+        setTimeout(avancarForca, 1600);
+      }
+    }
+  }
+
+  function avancarForca(){
+    forcaIndicePalavra++;
+    if(forcaIndicePalavra < forcaPalavrasRodada.length){
+      mostrarPalavraForca();
+    } else {
+      finalizarForca();
+    }
+  }
+
+  function finalizarForca(){
+    const total = forcaPalavrasRodada.length;
+    const aproveitamento = Math.round((forcaAcertos / total) * 100);
+    if(aproveitamento >= 75){ trofeuVitoriaForca.textContent = '🏆'; tocarSomVitoria(); }
+    else if(aproveitamento >= 50){ trofeuVitoriaForca.textContent = '🥈'; }
+    else { trofeuVitoriaForca.textContent = '🥉'; }
+
+    tituloVitoriaForca.textContent = 'Jogo finalizado!';
+    textoVitoriaForca.textContent = `Você acertou ${forcaAcertos} de ${total} palavras (${aproveitamento}% de aproveitamento) em ${CATEGORY_INFO[forcaCategoriaAtual].nome}.`;
+
+    esconderTodasAsTelas();
+    document.getElementById('tela-vitoria-forca').classList.remove('escondido');
+  }
+
+  document.getElementById('btn-voltar-menu-7-categorias').addEventListener('click', irParaMenu);
+  document.getElementById('btn-voltar-menu-7').addEventListener('click', irParaMenu);
+  document.getElementById('btn-menu-7').addEventListener('click', irParaMenu);
+  document.getElementById('btn-forca-de-novo').addEventListener('click', () => iniciarForca(forcaCategoriaAtual));
+  document.getElementById('btn-forca-outra-categoria').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-forca-categorias').classList.remove('escondido');
+  });
+
   /* ===================== MENU LATERAL DE NAVEGAÇÃO ===================== */
   const btnMenuLateral = document.getElementById('btn-menu-lateral');
   const sidebarNavegacao = document.getElementById('sidebar-navegacao');
@@ -3262,6 +3529,11 @@
     definirEstiloMusica('synthretro');
     esconderTodasAsTelas();
     document.getElementById('tela-corrida-intro').classList.remove('escondido');
+  }));
+  document.getElementById('nav-jogo-forca').addEventListener('click', () => navegarPara(() => {
+    definirEstiloMusica('synthretro');
+    esconderTodasAsTelas();
+    document.getElementById('tela-forca-categorias').classList.remove('escondido');
   }));
   document.getElementById('nav-conteudo-categorias').addEventListener('click', () => navegarPara(() => {
     definirEstiloMusica('chilltrap');
