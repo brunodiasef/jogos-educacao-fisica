@@ -13,11 +13,20 @@
 <meta name="apple-mobile-web-app-title" content="Jogos EF">
 <style>
   :root{
-    --quadra: #123524;
-    --quadra-escura: #0b2318;
+    --quadra: #7FC3E8;
+    --quadra-escura: #123B52;
     --giz: #f4efe1;
-    --dourado: #f2a93b;
-    --linha: rgba(244,239,225,0.18);
+    --dourado: #F0A93B;
+    --linha: rgba(18,59,82,0.18);
+
+    --texto-principal: #123B52;
+    --terracota: #B65C2E;
+    --azul-medio: #2E7AA6;
+    --azul-input: #EAF5FB;
+    --azul-placeholder: #7FA6BC;
+    --branco-azulado: #F3F8FB;
+    --card-bg: rgba(255,255,255,0.85);
+    --card-bg-leve: rgba(255,255,255,0.55);
 
     --cor-marca: #d64545;
     --cor-marca-esc: #8f2323;
@@ -47,17 +56,17 @@
   body{
     margin:0;
     min-height:100vh;
-    background:
-      radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 60%),
-      repeating-linear-gradient(0deg, var(--quadra) 0 90px, var(--quadra-escura) 90px 92px),
-      var(--quadra);
-    color: var(--giz);
+    background: linear-gradient(180deg, #BFE6F7 0%, #9CD3EE 55%, #7FC3E8 100%);
+    background-attachment: fixed;
+    color: var(--texto-principal);
     font-family: var(--fonte-corpo);
     display:flex;
     flex-direction:column;
     align-items:center;
     padding: 24px 16px 12px;
   }
+
+  .central-line, .central-circle{ display:none; }
 
   .central-line{
     position:fixed; top:0; bottom:0; left:50%; width:2px;
@@ -79,21 +88,21 @@
   header.titulo{ text-align:center; margin-bottom: 18px; }
   .escola{
     font-size: clamp(13px, 2.4vw, 17px); letter-spacing: 1px;
-    color: var(--dourado); font-weight:700; text-transform:uppercase; margin-bottom: 6px;
+    color: var(--terracota); font-weight:700; text-transform:uppercase; margin-bottom: 6px;
   }
   h1{
     font-family: var(--fonte-titulo); font-size: clamp(28px, 6vw, 46px);
-    letter-spacing: 1px; margin: 0; line-height:1.05; color: var(--giz);
-    text-shadow: 0 3px 0 var(--quadra-escura);
+    letter-spacing: 1px; margin: 0; line-height:1.05; color: #FFFFFF;
+    text-shadow: 0 3px 6px rgba(18,59,82,0.4);
   }
   h1 .destaque{ color: var(--dourado); }
 
   .faixa-conteudo{
     margin-top: 14px; display:inline-flex; align-items:center; gap:10px;
-    background: linear-gradient(135deg, var(--dourado), #d68a1a);
-    color: var(--quadra-escura); padding: 10px 26px; border-radius: 999px;
-    box-shadow: 0 6px 0 #9c6c1c, 0 10px 20px rgba(0,0,0,0.35);
-    border: 2px solid rgba(255,255,255,0.35);
+    background: linear-gradient(135deg, #F5B940, #E89A1F);
+    color: #24313A; padding: 10px 26px; border-radius: 999px;
+    box-shadow: 0 6px 0 #9c6c1c, 0 10px 20px rgba(18,59,82,0.25);
+    border: 2px solid rgba(255,255,255,0.5);
   }
   .faixa-conteudo .bola{ font-size: 20px; line-height:1; }
   .faixa-conteudo span.texto{
@@ -107,49 +116,49 @@
 
   /* ---------- TELA DE IDENTIFICAÇÃO ---------- */
   .cartao-identificacao{
-    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    background: var(--card-bg); border: 2px solid var(--linha); border-radius: 16px;
     padding: 28px 26px; max-width: 420px; width:100%; text-align:center;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    box-shadow: 0 10px 24px rgba(18,59,82,0.18);
   }
   .cartao-identificacao h2{ font-family: var(--fonte-titulo); font-size: clamp(18px, 4vw, 24px); margin: 0 0 6px; color: var(--dourado); }
-  .cartao-identificacao p{ margin: 0 0 20px; font-size: 14px; opacity:0.85; }
+  .cartao-identificacao p{ margin: 0 0 20px; font-size: 14px; color: var(--texto-principal); opacity:0.9; }
   .campo{ text-align:left; margin-bottom: 16px; }
-  .campo label{ display:block; font-size:12.5px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado); font-weight:700; margin-bottom: 6px; }
+  .campo label{ display:block; font-size:12.5px; text-transform:uppercase; letter-spacing:0.5px; color: var(--azul-medio); font-weight:700; margin-bottom: 6px; }
   .campo input{
     width:100%; padding: 11px 14px; border-radius: 8px; border: 2px solid var(--linha);
-    background: rgba(244,239,225,0.08); color: var(--giz); font-size: 15px;
+    background: var(--azul-input); color: var(--texto-principal); font-size: 15px;
     font-family: var(--fonte-corpo); outline:none;
   }
-  .campo input::placeholder{ color: rgba(244,239,225,0.4); }
-  .campo input:focus{ border-color: var(--dourado); background: rgba(244,239,225,0.14); }
-  .erro-campo{ color:#ffb4b4; font-size:12.5px; margin-top:6px; min-height:14px; display:block; }
+  .campo input::placeholder{ color: var(--azul-placeholder); }
+  .campo input:focus{ border-color: var(--dourado); background: #ffffff; }
+  .erro-campo{ color:#c0392b; font-size:12.5px; margin-top:6px; min-height:14px; display:block; }
 
   .crachá-aluno{
-    font-size: 13px; opacity:0.8; margin-bottom: 14px; text-align:center;
-    background: rgba(0,0,0,0.2); border: 1px solid var(--linha);
+    font-size: 13px; color: var(--texto-principal); opacity:0.9; margin-bottom: 14px; text-align:center;
+    background: var(--card-bg-leve); border: 1px solid var(--linha);
     padding: 6px 14px; border-radius: 999px;
   }
-  .crachá-aluno b{ color: var(--dourado); }
+  .crachá-aluno b{ color: var(--terracota); }
 
   /* ---------- MENU DE JOGOS ---------- */
   .cartao-conteudo{
-    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    background: var(--card-bg); border: 2px solid var(--linha); border-radius: 16px;
     padding: 28px 26px; max-width: 640px; width:100%; margin: 0 auto;
   }
   .cartao-conteudo h2{
     font-family: var(--fonte-titulo); color: var(--dourado); margin: 0 0 14px;
     font-size: clamp(19px, 4vw, 25px);
   }
-  .cartao-conteudo p{ font-size: 14.5px; line-height:1.6; opacity:0.95; margin: 0 0 20px; }
+  .cartao-conteudo p{ font-size: 14.5px; line-height:1.6; color: var(--texto-principal); opacity:0.95; margin: 0 0 20px; }
   .cartao-conteudo h3{
-    font-size: 13px; text-transform:uppercase; letter-spacing:0.5px; color: var(--dourado);
+    font-size: 13px; text-transform:uppercase; letter-spacing:0.5px; color: var(--azul-medio);
     margin: 0 0 12px;
   }
   .grid-exemplos-conteudo{
     display:grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px;
   }
   .exemplo-conteudo-item{
-    background: var(--giz); border-radius: 10px; padding: 10px 6px; text-align:center;
+    background: var(--branco-azulado); border-radius: 10px; padding: 10px 6px; text-align:center;
     display:flex; flex-direction:column; align-items:center; gap:6px;
     cursor:pointer; border: 3px solid transparent; transition: transform .12s ease, border-color .12s ease;
   }
@@ -162,31 +171,32 @@
   }
   .abas-conteudo{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
   .aba-conteudo{
-    background: rgba(244,239,225,0.08); border: 1px solid var(--linha); color: var(--giz);
+    background: rgba(18,59,82,0.06); border: 1px solid var(--linha); color: var(--texto-principal);
     padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight:700; cursor:pointer;
     font-family: var(--fonte-corpo);
   }
-  .aba-conteudo.ativa{ background: rgba(242,169,59,0.2); border-color: var(--dourado); color: var(--dourado); }
+  .aba-conteudo.ativa{ background: rgba(240,169,59,0.22); border-color: var(--dourado); color: var(--terracota); }
   #texto-conteudo-detalhe{ margin-bottom: 20px; }
-  #texto-conteudo-detalhe p{ font-size: 14.5px; line-height:1.6; opacity:0.95; margin:0; }
-  .lista-caracteristicas{ margin:0; padding-left: 20px; font-size: 14px; line-height:1.8; opacity:0.95; }
+  #texto-conteudo-detalhe p{ font-size: 14.5px; line-height:1.6; color: var(--texto-principal); opacity:0.95; margin:0; }
+  .lista-caracteristicas{ margin:0; padding-left: 20px; font-size: 14px; line-height:1.8; color: var(--texto-principal); opacity:0.95; }
   .descricao-exemplo-conteudo{
-    margin-top:14px; font-size:13.5px; line-height:1.5; background: rgba(242,169,59,0.1);
+    margin-top:14px; font-size:13.5px; line-height:1.5; background: rgba(240,169,59,0.12);
     border: 1px solid var(--dourado); border-radius:10px; padding:12px 14px; display:none;
+    color: var(--texto-principal);
   }
   .descricao-exemplo-conteudo.mostrar{ display:block; }
-  .descricao-exemplo-conteudo b{ color: var(--dourado); }
+  .descricao-exemplo-conteudo b{ color: var(--terracota); }
   .tabela-conteudo{ width:100%; border-collapse: collapse; font-size: 13px; }
   .tabela-conteudo th, .tabela-conteudo td{
-    padding: 7px 10px; border-bottom: 1px solid var(--linha); text-align:left;
+    padding: 7px 10px; border-bottom: 1px solid var(--linha); text-align:left; color: var(--texto-principal);
   }
-  .tabela-conteudo th{ color: var(--dourado); text-transform:uppercase; font-size: 11px; letter-spacing:0.3px; }
-  .outros-exemplos-conteudo{ font-size:12.5px; opacity:0.75; margin: 12px 0 0; font-style:italic; }
+  .tabela-conteudo th{ color: var(--azul-medio); text-transform:uppercase; font-size: 11px; letter-spacing:0.3px; }
+  .outros-exemplos-conteudo{ font-size:12.5px; color: var(--texto-principal); opacity:0.75; margin: 12px 0 0; font-style:italic; }
   .titulo-jogo-entrada{
     font-size: clamp(22px, 5vw, 32px); margin: 0 0 16px; text-align:center;
-    font-family: var(--fonte-corpo);
+    font-family: var(--fonte-corpo); color: var(--quadra-escura);
   }
-  .instrucao{ font-size: 15px; opacity: 0.85; margin-bottom: 18px; text-align:center; }
+  .instrucao{ font-size: 15px; color: var(--texto-principal); opacity: 0.85; margin-bottom: 18px; text-align:center; }
 
   .grid-menu{
     display:grid; grid-template-columns: repeat(6, minmax(150px, 1fr));
@@ -282,7 +292,7 @@
   }
   .btn:hover{ transform: translateY(-2px); }
   .btn:active{ transform: translateY(1px); box-shadow:0 2px 0 #9c6c1c; }
-  .btn.secundario{ background: transparent; color: var(--giz); border: 2px solid var(--linha); box-shadow:none; }
+  .btn.secundario{ background: rgba(255,255,255,0.5); color: var(--quadra-escura); border: 2px solid var(--linha); box-shadow:none; }
   .btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none !important; }
 
   /* ---------- TABULEIRO JOGO DA MEMÓRIA ---------- */
@@ -370,26 +380,26 @@
 
   /* ---------- JOGO 3: ACERTE A PERGUNTA (QUIZ) ---------- */
   .cartao-quiz{
-    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    background: var(--card-bg); border: 2px solid var(--linha); border-radius: 16px;
     padding: 26px 24px; max-width: 560px; width:100%;
   }
   .quiz-contador{ font-size:12.5px; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
-  .quiz-pergunta{ font-family: var(--fonte-titulo); font-size: clamp(17px, 3.6vw, 22px); color: var(--dourado); margin-bottom: 20px; line-height:1.3; }
+  .quiz-pergunta{ font-family: var(--fonte-titulo); font-size: clamp(17px, 3.6vw, 22px); color: var(--quadra-escura); margin-bottom: 20px; line-height:1.3; }
   .quiz-opcoes{ display:flex; flex-direction:column; gap:12px; }
   .opcao-quiz{
-    text-align:left; background: rgba(244,239,225,0.08); border: 2px solid var(--linha);
-    color: var(--giz); border-radius: 10px; padding: 14px 16px; cursor:pointer;
+    text-align:left; background: rgba(18,59,82,0.05); border: 2px solid var(--linha);
+    color: var(--texto-principal); border-radius: 10px; padding: 14px 16px; cursor:pointer;
     font-size: 13.5px; line-height:1.4; font-family: var(--fonte-corpo);
     transition: transform .12s ease, background .15s ease, border-color .15s ease;
   }
-  .opcao-quiz:hover:not(:disabled){ background: rgba(244,239,225,0.16); transform: translateX(3px); }
+  .opcao-quiz:hover:not(:disabled){ background: rgba(18,59,82,0.1); transform: translateX(3px); }
   .opcao-quiz:disabled{ cursor:default; }
   .opcao-quiz.correta{ background: rgba(76,175,80,0.25); border-color:#4caf50; }
   .opcao-quiz.incorreta{ background: rgba(214,69,69,0.25); border-color:#d64545; }
 
   /* ---------- JOGO 7: FORCA ---------- */
   .cartao-forca{
-    background: rgba(0,0,0,0.25); border: 2px solid var(--linha); border-radius: 16px;
+    background: var(--card-bg); border: 2px solid var(--linha); border-radius: 16px;
     padding: 24px 22px; max-width: 620px; width:100%; display:flex; flex-direction:column; align-items:center; gap:16px;
   }
   .forca-contador{ font-size:12.5px; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; align-self:flex-start; }
@@ -412,11 +422,11 @@
     display:grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap:6px; width:100%; max-width:480px;
   }
   .tecla-forca{
-    background: rgba(244,239,225,0.1); border: 2px solid var(--linha); color: var(--giz);
+    background: rgba(18,59,82,0.06); border: 2px solid var(--linha); color: var(--texto-principal);
     border-radius: 8px; padding: 9px 0; font-size:14px; font-weight:800; cursor:pointer;
     font-family: var(--fonte-corpo); transition: background .15s ease, transform .1s ease;
   }
-  .tecla-forca:hover:not(:disabled){ background: rgba(244,239,225,0.2); }
+  .tecla-forca:hover:not(:disabled){ background: rgba(18,59,82,0.14); }
   .tecla-forca:disabled{ cursor:default; opacity:0.4; }
   .tecla-forca.acertou{ background: rgba(76,175,80,0.35); border-color:#4caf50; opacity:1; }
   .tecla-forca.errou{ background: rgba(214,69,69,0.35); border-color:#d64545; opacity:1; }
@@ -428,7 +438,7 @@
   }
   .grade-cruzadas{
     display:grid; gap: 2px; width:100%; max-width: 460px;
-    background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px;
+    background: rgba(18,59,82,0.08); padding: 4px; border-radius: 8px;
   }
   .celula-cruzada, .celula-bloqueada{ aspect-ratio: 1 / 1; position:relative; }
   .celula-bloqueada{ background: transparent; }
@@ -457,10 +467,10 @@
   .lista-dicas ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
   .item-dica{
     font-size: 12.5px; line-height:1.4; cursor:pointer; padding: 7px 10px;
-    border-radius: 8px; border: 1px solid transparent; background: rgba(244,239,225,0.05);
+    border-radius: 8px; border: 1px solid transparent; background: rgba(18,59,82,0.05); color: var(--texto-principal);
     transition: background .15s ease, border-color .15s ease;
   }
-  .item-dica:hover{ background: rgba(244,239,225,0.12); }
+  .item-dica:hover{ background: rgba(18,59,82,0.1); }
   .item-dica.ativa{ background: rgba(242,169,59,0.18); border-color: var(--dourado); }
   .item-dica.resolvida{ opacity:0.55; text-decoration: line-through; }
   .item-dica b{ color: var(--dourado); margin-right:5px; }
@@ -472,7 +482,7 @@
   }
   .grade-caca{
     display:grid; gap: 2px; width:100%; max-width: 460px;
-    background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px;
+    background: rgba(18,59,82,0.08); padding: 4px; border-radius: 8px;
     touch-action: none; user-select: none; -webkit-user-select: none;
   }
   .celula-caca{
@@ -558,7 +568,7 @@
 
   .painel-corrida{
     width:100%; display:grid; grid-template-columns: repeat(4, 1fr);
-    gap: 8px; background: rgba(0,0,0,0.25); border: 1px solid var(--linha);
+    gap: 8px; background: var(--card-bg); border: 1px solid var(--linha);
     border-radius: 12px; padding: 10px 14px;
   }
   .painel-item{ text-align:center; font-size: 11.5px; }
@@ -667,12 +677,12 @@
   }
   .opcoes-corrida{ display:flex; flex-direction:column; gap: 10px; }
   .opcao-corrida{
-    text-align:left; background: rgba(244,239,225,0.08); border: 2px solid var(--linha);
-    color: var(--giz); border-radius: 10px; padding: 12px 14px; cursor:pointer;
+    text-align:left; background: rgba(255,255,255,0.5); border: 2px solid var(--linha);
+    color: var(--quadra-escura); border-radius: 10px; padding: 12px 14px; cursor:pointer;
     font-size: 13px; line-height:1.4; font-family: var(--fonte-corpo);
   }
-  .opcao-corrida b{ color: var(--dourado); margin-right:6px; }
-  .opcao-corrida:hover:not(:disabled){ background: rgba(244,239,225,0.16); }
+  .opcao-corrida b{ color: var(--terracota); margin-right:6px; }
+  .opcao-corrida:hover:not(:disabled){ background: rgba(255,255,255,0.75); }
   .opcao-corrida:disabled{ cursor:default; }
   .opcao-corrida.correta{ background: rgba(76,175,80,0.28); border-color:#4caf50; }
   .opcao-corrida.incorreta{ background: rgba(214,69,69,0.28); border-color:#d64545; }
@@ -683,7 +693,7 @@
   .feedback-corrida.erro{ color:#ff9d9d; }
 
   .btn-som-efeitos{
-    background: rgba(0,0,0,0.25); color: var(--giz); border: 2px solid var(--linha);
+    background: var(--card-bg-leve); color: var(--texto-principal); border: 2px solid var(--linha);
     border-radius: 999px; padding: 6px 14px; font-size: 11.5px; font-weight:700; cursor:pointer;
   }
   .btn-som-efeitos:hover{ border-color: var(--dourado); }
@@ -710,17 +720,17 @@
 
   .btn-musica{
     position: fixed; top: 14px; right: 14px; z-index: 20;
-    background: rgba(0,0,0,0.35); color: var(--giz); border: 2px solid var(--linha);
+    background: rgba(255,255,255,0.55); color: var(--quadra-escura); border: 2px solid var(--linha);
     border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight:700;
-    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(2px);
+    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(4px);
   }
   .btn-musica:hover{ border-color: var(--dourado); }
 
   .btn-menu-lateral{
     position: fixed; top: 14px; left: 14px; z-index: 25;
-    background: rgba(0,0,0,0.35); color: var(--giz); border: 2px solid var(--linha);
+    background: rgba(255,255,255,0.55); color: var(--quadra-escura); border: 2px solid var(--linha);
     border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight:700;
-    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(2px);
+    cursor:pointer; letter-spacing:0.3px; backdrop-filter: blur(4px);
   }
   .btn-menu-lateral:hover{ border-color: var(--dourado); }
 
@@ -893,9 +903,26 @@
     <img src="logo-prof-bruno.png" alt="Jogos E.F. - Prof. Bruno Dias" class="logo-hub">
   </section>
 
+  <!-- CONTEÚDO: MENU (Tipos de Esporte) -->
+  <section id="tela-conteudo-menu" class="escondido">
+    <h1 class="titulo-jogo-entrada">📚 Conteúdo</h1>
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-hub-conteudo-menu">Voltar</button>
+    </div>
+    <p class="instrucao">O que você quer estudar?</p>
+    <div class="grid-categorias" style="max-width:420px; margin:0 auto;">
+      <button class="cat-card marca" id="btn-tipos-de-esporte" style="text-align:center;">
+        <div class="cat-nome">🏷️ Tipos de Esporte</div>
+        <div class="cat-exemplos">Marca, Invasão, Precisão, Técnico-Combinatório e Rede</div>
+      </button>
+    </div>
+    <img src="logo-prof-bruno.png" alt="Jogos E.F. - Prof. Bruno Dias" class="logo-hub">
+  </section>
+
   <!-- CONTEÚDO: SELEÇÃO DE CATEGORIA -->
   <section id="tela-conteudo-categorias" class="escondido">
-    <h1 class="titulo-jogo-entrada">📚 Conteúdo</h1>
+    <h1 class="titulo-jogo-entrada">🏷️ Tipos de Esporte</h1>
     <div class="barra-jogo" style="max-width:720px;">
       <div></div>
       <button class="btn secundario" id="btn-voltar-hub-2">Voltar</button>
@@ -1187,10 +1214,10 @@
 
       <div class="forca-area-principal">
         <svg viewBox="0 0 200 220" class="forca-desenho">
-          <line x1="20" y1="210" x2="140" y2="210" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
-          <line x1="50" y1="210" x2="50" y2="20" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
-          <line x1="50" y1="20" x2="130" y2="20" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
-          <line x1="130" y1="20" x2="130" y2="45" stroke="#f4efe1" stroke-width="6" stroke-linecap="round"/>
+          <line x1="20" y1="210" x2="140" y2="210" stroke="#123B52" stroke-width="6" stroke-linecap="round"/>
+          <line x1="50" y1="210" x2="50" y2="20" stroke="#123B52" stroke-width="6" stroke-linecap="round"/>
+          <line x1="50" y1="20" x2="130" y2="20" stroke="#123B52" stroke-width="6" stroke-linecap="round"/>
+          <line x1="130" y1="20" x2="130" y2="45" stroke="#123B52" stroke-width="6" stroke-linecap="round"/>
           <circle id="forca-parte-1" cx="130" cy="65" r="20" fill="none" stroke="#f2a93b" stroke-width="6" class="forca-parte"/>
           <line id="forca-parte-2" x1="130" y1="85" x2="130" y2="140" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
           <line id="forca-parte-3" x1="130" y1="100" x2="105" y2="125" stroke="#f2a93b" stroke-width="6" stroke-linecap="round" class="forca-parte"/>
@@ -1952,7 +1979,7 @@
      'tela-caca','tela-vitoria-caca',
      'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida',
      'tela-forca-categorias','tela-forca','tela-vitoria-forca',
-     'tela-conteudo-categorias','tela-conteudo-detalhe'
+     'tela-conteudo-menu','tela-conteudo-categorias','tela-conteudo-detalhe'
     ].forEach(id => document.getElementById(id).classList.add('escondido'));
   }
 
@@ -1990,10 +2017,18 @@
   document.getElementById('btn-hub-conteudo').addEventListener('click', () => {
     definirEstiloMusica('chilltrap');
     esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-menu').classList.remove('escondido');
+  });
+  document.getElementById('btn-voltar-hub-conteudo-menu').addEventListener('click', irParaHub);
+  document.getElementById('btn-tipos-de-esporte').addEventListener('click', () => {
+    esconderTodasAsTelas();
     document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
   });
   document.getElementById('btn-voltar-hub-1').addEventListener('click', irParaHub);
-  document.getElementById('btn-voltar-hub-2').addEventListener('click', irParaHub);
+  document.getElementById('btn-voltar-hub-2').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-conteudo-menu').classList.remove('escondido');
+  });
   document.getElementById('btn-voltar-conteudo-categorias').addEventListener('click', () => {
     esconderTodasAsTelas();
     document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
