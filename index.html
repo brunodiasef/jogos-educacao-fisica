@@ -198,6 +198,14 @@
   }
   .instrucao{ font-size: 15px; color: var(--texto-principal); opacity: 0.85; margin-bottom: 18px; text-align:center; }
 
+  .categoria-jogos-label{
+    display:inline-block; margin: 4px auto 10px; background: linear-gradient(135deg, #F5B940, #E89A1F);
+    color:#24313A; font-family: var(--fonte-titulo); font-size: clamp(14px, 3vw, 18px);
+    letter-spacing:0.5px; padding: 8px 22px; border-radius: 999px;
+    box-shadow: 0 4px 0 #9c6c1c, 0 6px 14px rgba(18,59,82,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+
   .grid-menu{
     display:grid; grid-template-columns: repeat(6, minmax(150px, 1fr));
     gap: 18px; width:100%; max-width: 1240px;
@@ -855,6 +863,23 @@
   </section>
 
   <!-- MENU DE JOGOS -->
+  <!-- JOGOS: MENU (Tipos de Esporte) -->
+  <section id="tela-jogos-menu" class="escondido">
+    <h1 class="titulo-jogo-entrada">🎮 Jogos</h1>
+    <div class="barra-jogo" style="max-width:720px;">
+      <div></div>
+      <button class="btn secundario" id="btn-voltar-hub-jogos-menu">Voltar</button>
+    </div>
+    <p class="instrucao">O que você quer jogar?</p>
+    <div class="grid-categorias" style="max-width:420px; margin:0 auto;">
+      <button class="cat-card marca" id="btn-jogos-tipos-de-esporte" style="text-align:center;">
+        <div class="cat-nome">🏷️ Tipos de Esporte</div>
+        <div class="cat-exemplos">7 jogos sobre classificação dos esportes</div>
+      </button>
+    </div>
+    <img src="logo-prof-bruno.png" alt="Jogos E.F. - Prof. Bruno Dias" class="logo-hub">
+  </section>
+
   <section id="tela-menu" class="escondido">
     <div class="crachá-aluno" id="crachá-aluno"></div>
     <div class="barra-jogo" style="max-width:920px;">
@@ -1979,7 +2004,7 @@
      'tela-caca','tela-vitoria-caca',
      'tela-corrida-intro','tela-corrida-jogo','tela-vitoria-corrida',
      'tela-forca-categorias','tela-forca','tela-vitoria-forca',
-     'tela-conteudo-menu','tela-conteudo-categorias','tela-conteudo-detalhe'
+     'tela-conteudo-menu','tela-conteudo-categorias','tela-conteudo-detalhe','tela-jogos-menu'
     ].forEach(id => document.getElementById(id).classList.add('escondido'));
   }
 
@@ -2013,7 +2038,13 @@
     irParaHub();
   });
 
-  document.getElementById('btn-hub-jogos').addEventListener('click', irParaMenu);
+  document.getElementById('btn-hub-jogos').addEventListener('click', () => {
+    definirEstiloMusica('synthretro');
+    esconderTodasAsTelas();
+    document.getElementById('tela-jogos-menu').classList.remove('escondido');
+  });
+  document.getElementById('btn-voltar-hub-jogos-menu').addEventListener('click', irParaHub);
+  document.getElementById('btn-jogos-tipos-de-esporte').addEventListener('click', irParaMenu);
   document.getElementById('btn-hub-conteudo').addEventListener('click', () => {
     definirEstiloMusica('chilltrap');
     esconderTodasAsTelas();
@@ -2024,7 +2055,10 @@
     esconderTodasAsTelas();
     document.getElementById('tela-conteudo-categorias').classList.remove('escondido');
   });
-  document.getElementById('btn-voltar-hub-1').addEventListener('click', irParaHub);
+  document.getElementById('btn-voltar-hub-1').addEventListener('click', () => {
+    esconderTodasAsTelas();
+    document.getElementById('tela-jogos-menu').classList.remove('escondido');
+  });
   document.getElementById('btn-voltar-hub-2').addEventListener('click', () => {
     esconderTodasAsTelas();
     document.getElementById('tela-conteudo-menu').classList.remove('escondido');
