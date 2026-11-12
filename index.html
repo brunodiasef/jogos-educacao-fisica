@@ -769,7 +769,232 @@
   .fechar-sidebar:hover{ color: var(--dourado); }
   footer b{ color: var(--quadra-escura); }
 
-  @media (prefers-reduced-motion: reduce){ .carta-interior, .cat-card, .jogo-card, .btn{ transition:none !important; } }
+  /* =====================================================================
+     ANIMAÇÕES E INTERATIVIDADE
+     Só transform e opacity são animados, para rodar liso em celular simples.
+     ===================================================================== */
+
+  /* ---------- Fundo: bolas e equipamentos flutuando ---------- */
+  .fundo-animado{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .bola-fundo{
+    position:absolute; bottom:-80px; font-size: var(--tam, 34px); opacity:0.2;
+    animation: flutuarFundo var(--dur, 22s) linear infinite; animation-delay: var(--atraso, 0s);
+    will-change: transform;
+  }
+  @keyframes flutuarFundo{
+    from{ transform: translate3d(0, 0, 0) rotate(0deg); }
+    to{ transform: translate3d(var(--desvio, 40px), -125vh, 0) rotate(var(--giro, 360deg)); }
+  }
+
+  /* ---------- Entrada das telas e dos cartões ---------- */
+  .app > section:not(.escondido){ animation: entrarTela .38s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  @keyframes entrarTela{ from{ opacity:0; transform: translateY(18px); } }
+
+  .grid-menu > *, .grid-categorias > *{ animation: surgirCard .45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+  .grid-menu > *:nth-child(2), .grid-categorias > *:nth-child(2){ animation-delay: .06s; }
+  .grid-menu > *:nth-child(3), .grid-categorias > *:nth-child(3){ animation-delay: .12s; }
+  .grid-menu > *:nth-child(4), .grid-categorias > *:nth-child(4){ animation-delay: .18s; }
+  .grid-menu > *:nth-child(5), .grid-categorias > *:nth-child(5){ animation-delay: .24s; }
+  .grid-menu > *:nth-child(6){ animation-delay: .30s; }
+  .grid-menu > *:nth-child(7){ animation-delay: .36s; }
+  @keyframes surgirCard{ from{ opacity:0; transform: translateY(22px) scale(.9); } }
+
+  /* ---------- Cartões: brilho passando e emoji quicando ---------- */
+  .jogo-card{ overflow:hidden; }
+  .jogo-card::before, .cat-card::before{
+    content:''; position:absolute; top:0; left:-60%; width:50%; height:100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.38), transparent);
+    transform: skewX(-20deg); pointer-events:none;
+  }
+  .jogo-card:hover::before, .cat-card:hover::before{ animation: brilhoCard .7s ease; }
+  @keyframes brilhoCard{ to{ transform: translateX(440%) skewX(-20deg); } }
+  .jogo-card:hover .emoji{ animation: quicar .55s ease; }
+  @keyframes quicar{ 0%,100%{ transform: translateY(0) scale(1); } 40%{ transform: translateY(-10px) scale(1.18); } 70%{ transform: translateY(2px) scale(.96); } }
+  .jogo-card:active, .cat-card:active, .btn-categoria:active{ transform: translateY(2px) scale(.97); }
+
+  .jogo-card.concluido::after{
+    content:'🏅'; position:absolute; top:8px; right:10px; font-size:26px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.35));
+    animation: entrarTrofeu .6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  }
+
+  /* ---------- Onda ao tocar nos botões ---------- */
+  .btn, .btn-categoria, .opcao-quiz, .opcao-corrida, .tecla-forca, .aba-conteudo{ position:relative; overflow:hidden; }
+  .onda{
+    position:absolute; border-radius:50%; background: currentColor; opacity:.22;
+    transform: scale(0); pointer-events:none; animation: onda .5s ease-out forwards;
+  }
+  @keyframes onda{ to{ transform: scale(1); opacity:0; } }
+
+  /* ---------- Cabeçalho e logo ---------- */
+  .faixa-conteudo{ position:relative; overflow:hidden; }
+  .faixa-conteudo::after{
+    content:''; position:absolute; top:0; left:0; width:40%; height:100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.6), transparent);
+    transform: translateX(-150%) skewX(-20deg); pointer-events:none;
+    animation: brilhoFaixa 5s ease-in-out infinite;
+  }
+  @keyframes brilhoFaixa{ 0%,70%{ transform: translateX(-150%) skewX(-20deg); } 100%{ transform: translateX(400%) skewX(-20deg); } }
+  .faixa-conteudo .bola{ display:inline-block; transform-origin: 50% 0; animation: balancar 2.4s ease-in-out infinite; }
+  .faixa-conteudo .bola:last-child{ animation-delay: -1.2s; }
+  @keyframes balancar{ 0%,100%{ transform: rotate(-12deg); } 50%{ transform: rotate(12deg); } }
+  .logo-hub{ animation: flutuar 4s ease-in-out infinite; }
+  @keyframes flutuar{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-7px); } }
+
+  /* ---------- Placar: número "pula" quando muda ---------- */
+  .placar b{ display:inline-block; }
+  .placar b.pop, .painel-item b.pop{ animation: popNumero .35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes popNumero{ 0%{ transform: scale(1); } 45%{ transform: scale(1.6); } 100%{ transform: scale(1); } }
+
+  /* ---------- Cartas (Memória e Classificando) ---------- */
+  .tabuleiro .carta-interior, .tabuleiro-classificar .carta-interior{
+    animation: distribuirCarta .4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 35ms);
+  }
+  @keyframes distribuirCarta{ from{ opacity:0; transform: translateY(24px) rotateY(90deg); } }
+  @media (hover: hover){
+    .carta:not(.virada):not(.encontrada):not(.classificada):hover .carta-interior{ transform: translateY(-4px) rotateY(14deg); }
+  }
+  .carta.encontrada, .carta.classificada{ animation: pulsoAcerto .5s ease; }
+  @keyframes pulsoAcerto{ 0%{ transform: scale(1); } 40%{ transform: scale(1.13) rotate(-2deg); } 100%{ transform: scale(1); } }
+  .carta.classificada .frente{ border: 3px solid var(--cor-categoria, #4caf50); }
+  .btn-categoria.pulso{ animation: pulsoAcerto .45s ease; }
+
+  /* ---------- Quiz e perguntas da Corrida ---------- */
+  .barra-progresso{ height:8px; border-radius:999px; background: rgba(18,59,82,0.12); overflow:hidden; margin-bottom:12px; }
+  .barra-progresso > div{
+    height:100%; width:100%; border-radius:999px; background: linear-gradient(90deg, #F5B940, #E89A1F);
+    transform: scaleX(0); transform-origin: 0 50%; transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .quiz-opcoes .opcao-quiz, .opcoes-corrida .opcao-corrida{ animation: surgirOpcao .32s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  .quiz-opcoes > *:nth-child(2), .opcoes-corrida > *:nth-child(2){ animation-delay: .06s; }
+  .quiz-opcoes > *:nth-child(3), .opcoes-corrida > *:nth-child(3){ animation-delay: .12s; }
+  .quiz-opcoes > *:nth-child(4), .opcoes-corrida > *:nth-child(4){ animation-delay: .18s; }
+  .quiz-opcoes > *:nth-child(5){ animation-delay: .24s; }
+  @keyframes surgirOpcao{ from{ opacity:0; transform: translateX(-16px); } }
+  .opcao-quiz.correta, .opcao-corrida.correta, .tecla-forca.acertou{ animation: pulsoAcerto .45s ease; }
+  .opcao-quiz.incorreta, .opcao-corrida.incorreta, .tecla-forca.errou{ animation: tremer .35s; }
+  .overlay-pergunta-corrida:not(.escondido){ animation: aparecer .2s ease backwards; }
+  .overlay-pergunta-corrida:not(.escondido) .cartao-pergunta-corrida{ animation: surgirCard .4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+  @keyframes aparecer{ from{ opacity:0; } }
+
+  /* ---------- Forca: boneco desenhado traço a traço, letras virando ---------- */
+  .forca-parte{
+    opacity:0; stroke-dasharray:1; stroke-dashoffset:1;
+    transition: stroke-dashoffset .5s cubic-bezier(0.4, 0, 0.2, 1), opacity .12s;
+  }
+  .forca-parte.mostrar{ opacity:1; stroke-dashoffset:0; }
+  .forca-desenho.perdeu{ animation: tremer .35s 2; }
+  .forca-palavra{ letter-spacing:0; perspective: 400px; }
+  .palavra-forca{ display:inline-block; white-space:nowrap; margin: 2px .35em; }
+  .letra-forca{ display:inline-block; min-width:.8em; margin: 0 2px; }
+  .letra-forca.nova{ animation: revelarLetra .45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes revelarLetra{ from{ opacity:0; transform: translateY(-14px) rotateX(90deg) scale(.6); } }
+
+  /* ---------- Caça-palavras: cada palavra achada ganha uma cor ---------- */
+  .celula-caca{ transition: transform .1s ease; }
+  .celula-caca.selecionando{ transform: scale(1.1); }
+  .celula-caca.encontrada{
+    background: var(--cor-achada, #bfe6bd); color: var(--quadra-escura);
+    animation: ondaCaca .4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  }
+  @keyframes ondaCaca{ from{ transform: scale(.4) rotate(-12deg); } }
+
+  /* ---------- Corrida: casas piscando, peão pulando, dado chamando ---------- */
+  .casa-pista.pergunta{ animation: pulsarCasa 1.6s ease-in-out infinite; }
+  @keyframes pulsarCasa{
+    0%,100%{ transform: translate(-50%, -50%) scale(1); }
+    50%{ transform: translate(-50%, -50%) scale(1.14); }
+  }
+  .peao-corrida.pulando{ animation: pularPeao .26s ease; }
+  @keyframes pularPeao{
+    0%,100%{ transform: translate(-50%, -50%) scale(1); }
+    50%{ transform: translate(-50%, -95%) scale(1.15); }
+  }
+  .dado-corrida.rolando{ opacity:1; }
+  .dado-corrida:not(.desabilitado):not(.rolando){ animation: chamarDado 1.3s ease-in-out infinite; }
+  @keyframes chamarDado{ 0%,100%{ transform: translateY(0) rotate(0); } 50%{ transform: translateY(-6px) rotate(-5deg); } }
+
+  /* ---------- Vitória: troféu entra pulando com raios girando atrás ---------- */
+  .vitoria{ position:relative; }
+  .vitoria > *{ position:relative; z-index:1; }
+  .vitoria::before{
+    content:''; position:absolute; top:-58px; left:50%; width:240px; height:240px; margin-left:-120px;
+    border-radius:50%; pointer-events:none; z-index:0;
+    background: repeating-conic-gradient(rgba(255,255,255,0.6) 0 12deg, transparent 12deg 24deg);
+    -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%);
+            mask: radial-gradient(circle, #000 18%, transparent 68%);
+    animation: girarRaios 14s linear infinite;
+  }
+  @keyframes girarRaios{ to{ transform: rotate(360deg); } }
+  .vitoria .troféu, .vitoria-corrida-medalha{
+    display:inline-block;
+    animation: entrarTrofeu .8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards, flutuar 3s ease-in-out .8s infinite;
+  }
+  @keyframes entrarTrofeu{ from{ opacity:0; transform: scale(0) rotate(-40deg); } }
+
+  /* ---------- Partículas ao acertar ---------- */
+  .particula{
+    position:fixed; width:9px; height:9px; margin:-4px 0 0 -4px; border-radius:50%;
+    pointer-events:none; z-index:70; animation: estourar .65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes estourar{ to{ transform: translate(var(--dx), var(--dy)) scale(.2); opacity:0; } }
+
+  /* ---------- Medalhas ---------- */
+  .progresso-medalhas{
+    width:100%; max-width:360px; margin: 0 auto 14px; background: var(--card-bg);
+    border: 2px solid var(--linha); border-radius: 14px; padding: 8px 14px 10px;
+    text-align:center; font-weight:800; font-size:13.5px;
+  }
+  .trilho-medalhas{ height:10px; border-radius:999px; background: rgba(18,59,82,0.12); overflow:hidden; margin-top:6px; }
+  #barra-medalhas{
+    height:100%; width:100%; border-radius:999px; background: linear-gradient(90deg, #F5B940, #E89A1F);
+    transform: scaleX(0); transform-origin: 0 50%; transition: transform .7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ---------- Mascote "Bolinha": aparece para comemorar e dar força ---------- */
+  .mascote{
+    position:fixed; right:10px; bottom:0; z-index:45; display:flex; align-items:flex-end; gap:6px;
+    pointer-events:none; transform: translateY(115%);
+    transition: transform .25s cubic-bezier(0.4, 0, 1, 1);
+  }
+  .mascote.visivel{ transform: translateY(-8px); transition: transform .45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .corpo-mascote{
+    width:74px; height:74px; flex-shrink:0; transform-origin: 50% 100%;
+    filter: drop-shadow(0 4px 4px rgba(18,59,82,0.35));
+  }
+  .mascote.visivel.feliz .corpo-mascote{ animation: quicarMascote .55s ease .25s 2; }
+  .mascote.visivel.festa .corpo-mascote{ animation: festaMascote .9s ease .25s 2; }
+  .mascote.visivel.triste .corpo-mascote{ animation: tristeMascote .6s ease .25s; }
+  @keyframes quicarMascote{
+    0%,100%{ transform: translateY(0) scale(1, 1); }
+    35%{ transform: translateY(-16px) scale(.95, 1.06); }
+    70%{ transform: translateY(0) scale(1.08, .92); }
+  }
+  @keyframes festaMascote{
+    0%,100%{ transform: translateY(0) rotate(0); }
+    25%{ transform: translateY(-20px) rotate(-14deg); }
+    50%{ transform: translateY(0) rotate(0); }
+    75%{ transform: translateY(-20px) rotate(14deg); }
+  }
+  @keyframes tristeMascote{ 0%,100%{ transform: rotate(0); } 25%{ transform: rotate(-8deg); } 75%{ transform: rotate(8deg); } }
+  .olhos-mascote{ transform-box: fill-box; transform-origin: center; animation: piscar 3.2s infinite; }
+  @keyframes piscar{ 0%,92%,100%{ transform: scaleY(1); } 96%{ transform: scaleY(.1); } }
+  .balao-mascote{
+    background:#ffffff; color: var(--quadra-escura); border: 2px solid var(--quadra-escura);
+    border-radius: 14px 14px 4px 14px; padding: 8px 12px; font-size: 13.5px; font-weight:800;
+    line-height:1.3; max-width: min(230px, 60vw); margin-bottom: 38px;
+    box-shadow: 0 4px 0 rgba(18,59,82,0.25);
+  }
+
+  /* ---------- Quem pediu menos movimento no aparelho ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+      animation-delay: 0s !important; transition-duration: 0.01ms !important;
+    }
+    .fundo-animado, .vitoria::before, .faixa-conteudo::after{ display:none; }
+  }
 </style>
 </head>
 <body>
@@ -875,6 +1100,10 @@
     <div class="barra-jogo" style="max-width:920px;">
       <div></div>
       <button class="btn secundario" id="btn-voltar-hub-1">Voltar</button>
+    </div>
+    <div class="progresso-medalhas">
+      <span id="texto-medalhas">🏅 Medalhas: 0 de 7</span>
+      <div class="trilho-medalhas"><div id="barra-medalhas"></div></div>
     </div>
     <p class="instrucao">Escolha um jogo para começar:</p>
     <div class="grid-menu jogos">
@@ -1052,6 +1281,7 @@
       <button class="btn secundario" id="btn-voltar-menu-3">Voltar ao menu</button>
     </div>
     <div class="cartao-quiz">
+      <div class="barra-progresso"><div id="quiz-progresso"></div></div>
       <div class="quiz-contador" id="quiz-contador">Pergunta 1 de 4</div>
       <div class="quiz-pergunta" id="quiz-pergunta"></div>
       <div class="quiz-opcoes" id="quiz-opcoes"></div>
@@ -1423,14 +1653,17 @@
     else { pararMusica(); }
   });
 
-  function tocarSomAcerto(){
+  // comEfeito = false: só o som, sem partículas nem mascote (usado nas jogadas do computador)
+  function tocarSomAcerto(comEfeito = true){
+    if(comEfeito) reagirAcerto();
     if(!efeitosSonorosAtivos) return;
     garantirAudioContext();
     tocarNota(659.25, 0.12, 'triangle', 0.18, 0);
     tocarNota(987.77, 0.18, 'triangle', 0.18, 0.09);
   }
 
-  function tocarSomErro(){
+  function tocarSomErro(comEfeito = true){
+    if(comEfeito) reagirErro();
     if(!efeitosSonorosAtivos) return;
     garantirAudioContext();
     tocarNota(196.00, 0.22, 'sawtooth', 0.13, 0);
@@ -1438,6 +1671,7 @@
   }
 
   function tocarSomVitoria(){
+    reagirVitoria();
     if(!efeitosSonorosAtivos) return;
     garantirAudioContext();
     [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
@@ -2024,6 +2258,10 @@
     nomeAluno = nome;
     turmaAluno = turma;
     erroIdentificacao.textContent = '';
+    // outro aluno na mesma aba começa com as medalhas zeradas
+    let nomeAnterior = null;
+    try { nomeAnterior = sessionStorage.getItem('jogosEF.nome'); } catch(e){}
+    if(nomeAnterior !== nomeAluno) reiniciarMedalhas();
     try {
       sessionStorage.setItem('jogosEF.nome', nomeAluno);
       sessionStorage.setItem('jogosEF.turma', turmaAluno);
@@ -2034,6 +2272,7 @@
     iniciarMusica();
     document.getElementById('btn-menu-lateral').classList.remove('escondido');
     irParaHub();
+    falarMascote(`Olá, ${nomeAluno.split(' ')[0]}! Bora jogar? 💪`, 'feliz', 3200);
   });
 
   // Enter confirma a identificação
@@ -2164,9 +2403,10 @@
     pares = embaralhar(pares);
 
     tabuleiro.innerHTML = '';
-    pares.forEach((par) => {
+    pares.forEach((par, indice) => {
       const carta = document.createElement('div');
       carta.className = 'carta';
+      carta.style.setProperty('--i', indice);
       carta.dataset.id = par.id;
       carta.innerHTML = `
         <div class="carta-interior">
@@ -2232,7 +2472,9 @@
   function mostrarVitoriaMemoria(){
     tocarSomVitoria();
     tituloVitoria.textContent = `Parabéns, ${nomeAluno}!`;
-    textoVitoria.textContent = `Você completou "${categoriaAtual.nome}" em ${jogadas} jogadas. (Turma ${turmaAluno})`;
+    const estrelas = jogadas <= 6 ? '⭐⭐⭐' : (jogadas <= 9 ? '⭐⭐' : '⭐');
+    textoVitoria.textContent = `${estrelas} Você completou "${categoriaAtual.nome}" em ${jogadas} jogadas. (Turma ${turmaAluno})`;
+    marcarJogoConcluido('memoria');
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria').classList.remove('escondido');
   }
@@ -2269,9 +2511,10 @@
 
     const embaralhados = embaralhar(SPORTS_MEMORIA);
     tabuleiroClassificar.innerHTML = '';
-    embaralhados.forEach(sport => {
+    embaralhados.forEach((sport, indice) => {
       const carta = document.createElement('div');
       carta.className = 'carta carta-pequena';
+      carta.style.setProperty('--i', indice);
       carta.dataset.categoria = sport.categoria;
       carta.innerHTML = `
         <div class="carta-interior">
@@ -2312,6 +2555,11 @@
 
       if(correta){
         tocarSomAcerto();
+        // a carta fica com a cor da categoria e o botão dá um pulso
+        classSelecionada.style.setProperty('--cor-categoria', CATEGORY_INFO[chaveCategoria].corHex);
+        btn.classList.remove('pulso');
+        void btn.offsetWidth;
+        btn.classList.add('pulso');
         classSelecionada.classList.add('classificada');
         classSelecionada.classList.remove('selecionada');
         classAcertos++;
@@ -2337,6 +2585,7 @@
   function mostrarVitoriaClassificar(){
     tocarSomVitoria();
     tituloVitoriaClassificar.textContent = `Parabéns, ${nomeAluno}!`;
+    marcarJogoConcluido('classificando');
     textoVitoriaClassificar.textContent = `Você classificou todos os ${SPORTS_MEMORIA.length} esportes em ${classTentativas} tentativas. (Turma ${turmaAluno})`;
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria-classificar').classList.remove('escondido');
@@ -2390,6 +2639,7 @@
     const q = quizPerguntas[quizIndex];
     quizContador.textContent = `Pergunta ${quizIndex + 1} de ${quizPerguntas.length}`;
     quizPergunta.textContent = q.pergunta;
+    document.getElementById('quiz-progresso').style.transform = `scaleX(${(quizIndex + 1) / quizPerguntas.length})`;
 
     quizOpcoes.innerHTML = '';
     // alternativas em ordem aleatória a cada vez
@@ -2429,9 +2679,18 @@
   }
 
   function mostrarVitoriaQuiz(){
-    tocarSomVitoria();
-    tituloVitoriaQuiz.textContent = `Parabéns, ${nomeAluno}!`;
-    textoVitoriaQuiz.textContent = `Você acertou ${quizScore} de ${quizPerguntas.length} perguntas em "${CATEGORY_INFO[quizCategoriaAtual].nome}". (Turma ${turmaAluno})`;
+    const aprovado = quizScore / quizPerguntas.length >= 0.75;
+    const resumo = `Você acertou ${quizScore} de ${quizPerguntas.length} perguntas em "${CATEGORY_INFO[quizCategoriaAtual].nome}". (Turma ${turmaAluno})`;
+    document.querySelector('#tela-vitoria-quiz .troféu').textContent = aprovado ? '🏆' : '💪';
+    if(aprovado){
+      tocarSomVitoria();
+      tituloVitoriaQuiz.textContent = `Parabéns, ${nomeAluno}!`;
+      textoVitoriaQuiz.textContent = resumo;
+      marcarJogoConcluido('quiz');
+    } else {
+      tituloVitoriaQuiz.textContent = `Quiz finalizado, ${nomeAluno}!`;
+      textoVitoriaQuiz.textContent = `${resumo} Acerte 75% ou mais para ganhar a medalha 🏅.`;
+    }
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria-quiz').classList.remove('escondido');
   }
@@ -2719,6 +2978,7 @@
 
   function mostrarVitoriaCruzadas(){
     tituloVitoriaCruzadas.textContent = `Parabéns, ${nomeAluno}!`;
+    marcarJogoConcluido('cruzadas');
     textoVitoriaCruzadas.textContent = `Você completou as palavras cruzadas com os 15 esportes! (Turma ${turmaAluno})`;
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria-cruzadas').classList.remove('escondido');
@@ -2728,6 +2988,7 @@
 
   /* ===================== JOGO 5: CAÇA-PALAVRAS ===================== */
   const CACA_TAMANHO = 13;
+  const CORES_CACA = ['#bfe6bd', '#ffd9a8', '#c9d8ff', '#f7c6dc', '#d9c8f5', '#fff0a6', '#b8ecec'];
 
   const CACA_GRADE_LETRAS = [
     ['Q','V','L','O','B','E','T','U','F','T','N','H','E'],
@@ -2869,9 +3130,16 @@
 
     if(encontrada){
       cacaEncontradas.add(encontrada.palavra);
-      cels.forEach(cel => cacaCelulasEl[cel.r][cel.c].classList.add('encontrada'));
+      // cada palavra achada ganha uma cor, e as letras acendem em sequência
+      const corAchada = CORES_CACA[(cacaEncontradas.size - 1) % CORES_CACA.length];
+      cels.forEach((cel, i) => {
+        const el = cacaCelulasEl[cel.r][cel.c];
+        el.style.setProperty('--cor-achada', corAchada);
+        el.style.animationDelay = (i * 40) + 'ms';
+        el.classList.add('encontrada');
+      });
       const item = listaPalavrasCacaEl.querySelector(`[data-palavra="${encontrada.palavra}"]`);
-      if(item) item.classList.add('encontrada');
+      if(item){ item.classList.add('encontrada'); item.style.background = corAchada; }
       contadorEncontradasCaca.textContent = cacaEncontradas.size;
       tocarSomAcerto();
       if(cacaEncontradas.size === CACA_PALAVRAS.length){
@@ -2900,6 +3168,7 @@
   function mostrarVitoriaCaca(){
     tocarSomVitoria();
     tituloVitoriaCaca.textContent = `Parabéns, ${nomeAluno}!`;
+    marcarJogoConcluido('caca');
     textoVitoriaCaca.textContent = `Você encontrou as 15 palavras escondidas! (Turma ${turmaAluno})`;
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria-caca').classList.remove('escondido');
@@ -3171,7 +3440,7 @@
   function rolarDadoCorrida(aoTerminar){
     const sessao = corridaSessao;
     corridaRolando = true;
-    dadoCorridaEl.classList.add('rolando');
+    dadoCorridaEl.classList.add('rolando', 'desabilitado'); // volta a ficar ativo quando for a vez do aluno
     tocarSomDado();
 
     let contagem = 0;
@@ -3228,6 +3497,7 @@
         return;
       }
       atualizarPosicaoToken(id);
+      animarPulo(est.elemento);
       tocarSomMovimento();
       restante -= direcao;
       setTimeout(passoUnico, 260);
@@ -3318,10 +3588,10 @@
       const acertouComputador = Math.random() < CHANCE_ACERTO_COMPUTADOR;
       if(acertouComputador){
         turnoCorridaEl.textContent = '🤖 O computador acertou a pergunta!';
-        tocarSomAcerto();
+        tocarSomAcerto(false);
       } else {
         turnoCorridaEl.textContent = '🤖 O computador errou a pergunta.';
-        tocarSomErro();
+        tocarSomErro(false);
       }
       agendarCorrida(() => {
         const passos = acertouComputador ? 2 : -3;
@@ -3357,8 +3627,13 @@
   function finalizarPartidaCorrida(vencedorId){
     if(!corridaAtiva) return;
     corridaAtiva = false;
-    if(vencedorId === 'jogador'){ tocarSomVitoria(); dispararConfetti(); }
-    else { tocarSomErro(); }
+    if(vencedorId === 'jogador'){
+      tocarSomVitoria();
+      marcarJogoConcluido('corrida');
+    } else {
+      tocarSomErro(false);
+      falarMascote('Foi por pouco! Bora uma revanche? 🤖', 'triste', 3200);
+    }
 
     const totalRespostas = corridaAcertos + corridaErros;
     const aproveitamento = totalRespostas > 0 ? Math.round((corridaAcertos/totalRespostas)*100) : 0;
@@ -3479,17 +3754,21 @@
     forcaErrosEl.textContent = `Erros: 0/${FORCA_MAX_ERROS}`;
 
     document.querySelectorAll('.forca-parte').forEach(p => p.classList.remove('mostrar'));
+    document.querySelector('.forca-desenho').classList.remove('perdeu');
 
     atualizarPalavraForca();
     montarTecladoForca();
   }
 
-  function atualizarPalavraForca(){
-    const exibicao = forcaPalavraAtual.split('').map(ch => {
-      if(ch === ' ') return '&nbsp;&nbsp;';
-      return forcaLetrasCertas.has(ch) ? ch : '_';
-    }).join(' ');
-    forcaPalavraEl.innerHTML = exibicao;
+  function atualizarPalavraForca(letraNova){
+    // cada palavra fica num bloco que não quebra no meio; a letra recém-acertada entra girando
+    forcaPalavraEl.innerHTML = forcaPalavraAtual.split(' ').map(palavra => {
+      const letras = palavra.split('').map(ch => {
+        if(!forcaLetrasCertas.has(ch)) return '<span class="letra-forca">_</span>';
+        return `<span class="letra-forca${ch === letraNova ? ' nova' : ''}">${ch}</span>`;
+      }).join('');
+      return `<span class="palavra-forca">${letras}</span>`;
+    }).join('');
   }
 
   function montarTecladoForca(){
@@ -3511,7 +3790,7 @@
       forcaLetrasCertas.add(letra);
       botao.classList.add('acertou');
       tocarSomAcerto();
-      atualizarPalavraForca();
+      atualizarPalavraForca(letra);
 
       const completa = forcaPalavraAtual.split('').every(ch => ch === ' ' || forcaLetrasCertas.has(ch));
       if(completa){
@@ -3533,6 +3812,7 @@
         forcaBloqueada = true;
         forcaLetrasCertas = new Set(forcaPalavraAtual.split(''));
         atualizarPalavraForca();
+        document.querySelector('.forca-desenho').classList.add('perdeu');
         document.querySelectorAll('.forca-teclado .tecla-forca').forEach(b => b.disabled = true);
         setTimeout(avancarForca, 1600);
       }
@@ -3546,7 +3826,11 @@
     const letra = ev.key.toUpperCase();
     if(!/^[A-Z]$/.test(letra)) return;
     const botao = Array.from(forcaTeclado.querySelectorAll('.tecla-forca')).find(b => b.textContent === letra);
-    if(botao && !botao.disabled) botao.click();
+    if(botao && !botao.disabled){
+      const r = botao.getBoundingClientRect();
+      ultimoPonto = { x: r.left + r.width / 2, y: r.top + r.height / 2 }; // partículas saem da tecla
+      botao.click();
+    }
   });
 
   function avancarForca(){
@@ -3561,12 +3845,14 @@
   function finalizarForca(){
     const total = forcaPalavrasRodada.length;
     const aproveitamento = Math.round((forcaAcertos / total) * 100);
-    if(aproveitamento >= 75){ trofeuVitoriaForca.textContent = '🏆'; tocarSomVitoria(); }
+    if(aproveitamento >= 75){ trofeuVitoriaForca.textContent = '🏆'; tocarSomVitoria(); marcarJogoConcluido('forca'); }
     else if(aproveitamento >= 50){ trofeuVitoriaForca.textContent = '🥈'; }
     else { trofeuVitoriaForca.textContent = '🥉'; }
 
     tituloVitoriaForca.textContent = 'Jogo finalizado!';
     textoVitoriaForca.textContent = `Você acertou ${forcaAcertos} de ${total} palavras (${aproveitamento}% de aproveitamento) em ${CATEGORY_INFO[forcaCategoriaAtual].nome}.`;
+
+    if(aproveitamento < 75) textoVitoriaForca.textContent += ' Faça 75% ou mais para ganhar a medalha 🏅.';
 
     esconderTodasAsTelas();
     document.getElementById('tela-vitoria-forca').classList.remove('escondido');
@@ -3651,6 +3937,209 @@
   document.getElementById('nav-conteudo-precisao').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('precisao')));
   document.getElementById('nav-conteudo-rede').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('rede')));
   document.getElementById('nav-conteudo-combinatorio').addEventListener('click', () => navegarPara(() => mostrarConteudoCategoria('combinatorio')));
+
+  /* ===================== ANIMAÇÕES, MASCOTE E MEDALHAS ===================== */
+  const semMovimento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function sortear(lista){ return lista[Math.floor(Math.random() * lista.length)]; }
+
+  // --- Fundo: bolas e equipamentos subindo devagar atrás do jogo ---
+  (function criarFundoAnimado(){
+    const fundo = document.createElement('div');
+    fundo.className = 'fundo-animado';
+    fundo.setAttribute('aria-hidden', 'true');
+    const itens = ['⚽','🏀','🏐','🎾','🏓','🏸','🥏','🏉','🎯','⛳','🛹','🚴'];
+    itens.forEach((item, i) => {
+      const el = document.createElement('span');
+      el.className = 'bola-fundo';
+      el.textContent = item;
+      const duracao = 18 + Math.random() * 16;
+      el.style.left = (3 + (i / itens.length) * 92 + Math.random() * 4) + '%';
+      el.style.setProperty('--tam', (24 + Math.random() * 26) + 'px');
+      el.style.setProperty('--dur', duracao + 's');
+      el.style.setProperty('--atraso', (-Math.random() * duracao) + 's');
+      el.style.setProperty('--desvio', (Math.random() * 120 - 60) + 'px');
+      el.style.setProperty('--giro', (Math.random() < 0.5 ? -360 : 360) + 'deg');
+      fundo.appendChild(el);
+    });
+    document.body.insertBefore(fundo, document.body.firstChild);
+  })();
+
+  // --- Onda ao tocar nos botões; também guarda onde foi o último toque ---
+  let ultimoPonto = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  const SELETOR_ONDA = '.btn, .jogo-card, .cat-card, .btn-categoria, .opcao-quiz, .opcao-corrida, .tecla-forca, .aba-conteudo';
+
+  document.addEventListener('pointerdown', (ev) => {
+    ultimoPonto = { x: ev.clientX, y: ev.clientY };
+    const alvo = ev.target.closest ? ev.target.closest(SELETOR_ONDA) : null;
+    if(!alvo || alvo.disabled || semMovimento) return;
+    const r = alvo.getBoundingClientRect();
+    const tamanho = Math.max(r.width, r.height) * 2;
+    const onda = document.createElement('span');
+    onda.className = 'onda';
+    onda.style.width = onda.style.height = tamanho + 'px';
+    onda.style.left = (ev.clientX - r.left - tamanho / 2) + 'px';
+    onda.style.top = (ev.clientY - r.top - tamanho / 2) + 'px';
+    alvo.appendChild(onda);
+    onda.addEventListener('animationend', () => onda.remove());
+  }, true);
+  document.addEventListener('pointerup', (ev) => { ultimoPonto = { x: ev.clientX, y: ev.clientY }; }, true);
+
+  // --- Partículas coloridas no ponto do acerto ---
+  function estourarParticulas(x, y){
+    if(semMovimento) return;
+    const cores = ['#F0A93B', '#4caf50', '#2f6fed', '#d64545', '#7d3fd1', '#ffffff'];
+    for(let i = 0; i < 12; i++){
+      const p = document.createElement('span');
+      p.className = 'particula';
+      const angulo = (i / 12) * Math.PI * 2 + Math.random() * 0.5;
+      const distancia = 40 + Math.random() * 45;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = cores[i % cores.length];
+      p.style.setProperty('--dx', (Math.cos(angulo) * distancia) + 'px');
+      p.style.setProperty('--dy', (Math.sin(angulo) * distancia) + 'px');
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  function animarPulo(el){
+    el.classList.remove('pulando');
+    void el.offsetWidth; // reinicia a animação
+    el.classList.add('pulando');
+  }
+
+  // --- Placar: o número dá um pulinho sempre que muda ---
+  const observadorPlacar = new MutationObserver(mudancas => {
+    mudancas.forEach(m => {
+      const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+      if(!el) return;
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+    });
+  });
+  document.querySelectorAll('.placar b, .painel-item b').forEach(b => {
+    observadorPlacar.observe(b, { childList: true, characterData: true, subtree: true });
+  });
+
+  // --- Forca: prepara as partes do boneco para serem desenhadas traço a traço ---
+  document.querySelectorAll('.forca-parte').forEach(p => p.setAttribute('pathLength', '1'));
+
+  // --- Mascote "Bolinha" ---
+  const mascoteEl = document.createElement('div');
+  mascoteEl.className = 'mascote';
+  mascoteEl.setAttribute('aria-hidden', 'true');
+  mascoteEl.innerHTML = `
+    <div class="balao-mascote"></div>
+    <svg class="corpo-mascote" viewBox="0 0 100 100">
+      <circle cx="50" cy="54" r="40" fill="#F0A93B" stroke="#123B52" stroke-width="4"/>
+      <path d="M13 42 Q50 26 87 42" fill="none" stroke="#B65C2E" stroke-width="9" stroke-linecap="round"/>
+      <g class="olhos-mascote">
+        <ellipse cx="37" cy="57" rx="6.5" ry="8.5" fill="#ffffff" stroke="#123B52" stroke-width="2"/>
+        <ellipse cx="63" cy="57" rx="6.5" ry="8.5" fill="#ffffff" stroke="#123B52" stroke-width="2"/>
+        <circle cx="38" cy="58" r="3.2" fill="#123B52"/>
+        <circle cx="62" cy="58" r="3.2" fill="#123B52"/>
+      </g>
+      <path class="boca-mascote" d="M36 73 Q50 86 64 73" fill="none" stroke="#123B52" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  document.body.appendChild(mascoteEl);
+  const balaoMascote = mascoteEl.querySelector('.balao-mascote');
+  const bocaMascote = mascoteEl.querySelector('.boca-mascote');
+  const BOCAS_MASCOTE = {
+    feliz: 'M36 73 Q50 86 64 73',
+    triste: 'M37 82 Q50 71 63 82',
+    festa: 'M35 71 Q50 94 65 71 Z'
+  };
+  let mascoteTimer = null;
+
+  function falarMascote(texto, humor, duracao){
+    humor = humor || 'feliz';
+    balaoMascote.textContent = texto;
+    bocaMascote.setAttribute('d', BOCAS_MASCOTE[humor]);
+    bocaMascote.setAttribute('fill', humor === 'festa' ? '#8f2323' : 'none');
+    mascoteEl.classList.remove('feliz', 'triste', 'festa');
+    void mascoteEl.offsetWidth;
+    mascoteEl.classList.add('visivel', humor);
+    clearTimeout(mascoteTimer);
+    mascoteTimer = setTimeout(() => mascoteEl.classList.remove('visivel'), duracao || 2600);
+  }
+
+  // --- Sequências de acertos: a Bolinha comemora e dá força ---
+  const FRASES_SEQUENCIA = {
+    2: 'Duas seguidas! 🔥',
+    3: 'Hat-trick! ⚽⚽⚽',
+    5: 'Cinco seguidas! Que craque! 🌟',
+    8: 'Oito seguidas! Imparável! 🚀',
+    12: 'Doze seguidas! Nível seleção! 🇧🇷'
+  };
+  const FRASES_VITORIA = ['Golaço! 🥅', 'Show de bola! ⚽', 'Isso é que é campeão! 🏆', 'Mandou muito bem! 👏'];
+  let sequenciaAcertos = 0;
+  let sequenciaErros = 0;
+
+  function reagirAcerto(){
+    sequenciaAcertos++;
+    sequenciaErros = 0;
+    estourarParticulas(ultimoPonto.x, ultimoPonto.y);
+    if(FRASES_SEQUENCIA[sequenciaAcertos]) falarMascote(FRASES_SEQUENCIA[sequenciaAcertos], 'feliz');
+  }
+
+  function reagirErro(){
+    sequenciaErros++;
+    if(sequenciaAcertos >= 3) falarMascote('Acabou a sequência... Bora começar outra! 💪', 'triste');
+    else if(sequenciaErros % 3 === 0) falarMascote('Calma, respira e tenta de novo 😉', 'triste');
+    sequenciaAcertos = 0;
+  }
+
+  function reagirVitoria(){
+    dispararConfetti();
+    falarMascote(sortear(FRASES_VITORIA), 'festa', 3200);
+  }
+
+  // --- Medalhas: uma por jogo concluído (valem enquanto a aba estiver aberta) ---
+  const JOGOS_IDS = ['memoria', 'classificando', 'quiz', 'cruzadas', 'caca', 'corrida', 'forca'];
+  let jogosConcluidos = new Set();
+  try {
+    const salvos = JSON.parse(sessionStorage.getItem('jogosEF.medalhas') || '[]');
+    jogosConcluidos = new Set(salvos.filter(id => JOGOS_IDS.includes(id)));
+  } catch(e){ /* armazenamento indisponível */ }
+
+  function salvarMedalhas(){
+    try { sessionStorage.setItem('jogosEF.medalhas', JSON.stringify([...jogosConcluidos])); } catch(e){}
+  }
+
+  function atualizarMedalhas(){
+    JOGOS_IDS.forEach(id => {
+      document.getElementById('btn-jogo-' + id).classList.toggle('concluido', jogosConcluidos.has(id));
+    });
+    const total = JOGOS_IDS.length;
+    const conquistadas = jogosConcluidos.size;
+    document.getElementById('texto-medalhas').textContent = conquistadas === total
+      ? '🏆 Você conquistou as 7 medalhas!'
+      : `🏅 Medalhas: ${conquistadas} de ${total}`;
+    document.getElementById('barra-medalhas').style.transform = `scaleX(${conquistadas / total})`;
+  }
+
+  function reiniciarMedalhas(){
+    jogosConcluidos = new Set();
+    salvarMedalhas();
+    atualizarMedalhas();
+  }
+
+  function marcarJogoConcluido(id){
+    if(jogosConcluidos.has(id)) return;
+    jogosConcluidos.add(id);
+    salvarMedalhas();
+    atualizarMedalhas();
+    if(jogosConcluidos.size === JOGOS_IDS.length){
+      falarMascote('VOCÊ ZEROU OS 7 JOGOS! 🏆👑', 'festa', 5000);
+      setTimeout(dispararConfetti, 700);
+    } else {
+      falarMascote(`Nova medalha! 🏅 ${jogosConcluidos.size} de ${JOGOS_IDS.length}`, 'festa', 3200);
+    }
+  }
+
+  atualizarMedalhas();
 
 })();
 
