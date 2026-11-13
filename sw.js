@@ -2,7 +2,7 @@
 // Estratégia: tenta a rede primeiro (o aluno sempre recebe a versão mais nova)
 // e, sem internet, usa a cópia guardada no aparelho.
 // Ao publicar uma versão nova, basta mudar o número abaixo para limpar o cache antigo.
-const CACHE = 'jogos-ef-v2';
+const CACHE = 'jogos-ef-v3';
 
 const ARQUIVOS = [
   './',
