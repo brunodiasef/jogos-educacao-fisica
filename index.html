@@ -1004,6 +1004,94 @@
     box-shadow: 0 4px 0 rgba(18,59,82,0.25);
   }
 
+  /* ---------- Tela de abertura: cinco faixas, uma por categoria ---------- */
+  .abertura{ position:fixed; inset:0; z-index:100; background:#0d2a3b; overflow:hidden; }
+  .abertura-faixas{ position:absolute; top:0; bottom:0; left:-8vw; right:-8vw; display:flex; }
+  .abertura-col{ flex:1; transform: skewX(-10deg); margin: 0 -1px; }
+  .abertura-cor{
+    height:100%; display:flex; justify-content:center; padding-top: 8vh; color: var(--giz);
+    border-left: 3px solid rgba(244,239,225,0.35); will-change: transform;
+    animation: aberturaCai .55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--i) * .12s);
+  }
+  .abertura-col:nth-child(even) .abertura-cor{ animation-name: aberturaSobe; }
+  .abertura-conteudo{ transform: skewX(10deg); display:flex; flex-direction:column; align-items:center; gap:14px; }
+  /* as faixas das pontas passam um pouco da tela: o conteúdo delas é puxado para a parte visível */
+  .abertura-col:first-child .abertura-conteudo{ transform: skewX(10deg) translateX(4vw); }
+  .abertura-col:last-child .abertura-conteudo{ transform: skewX(10deg) translateX(-4vw); }
+  .abertura-icone{
+    width: min(11vw, 22vh, 130px);
+    animation: aberturaPop .5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards, aberturaQuica 1.6s ease-in-out infinite;
+    animation-delay: calc(.45s + var(--i) * .12s), calc(1.6s + var(--i) * .2s);
+  }
+  .abertura-icone svg{ width:100%; height:auto; display:block; filter: brightness(0) invert(1); }
+  .abertura-nome{
+    font-family: var(--fonte-titulo); font-size: clamp(10px, 1.5vw, 19px); text-transform:uppercase;
+    text-align:center; line-height:1.15; letter-spacing:.5px; max-width:16vw;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    animation: aberturaPop .4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    animation-delay: calc(.6s + var(--i) * .12s);
+  }
+  .abertura-banda{
+    position:absolute; left:0; right:0; bottom:0; background: var(--quadra-escura);
+    border-top: 6px solid var(--dourado); box-shadow: 0 -8px 24px rgba(0,0,0,0.35);
+    display:flex; align-items:center; gap:18px; padding: 16px clamp(16px, 4vw, 48px);
+    animation: aberturaSobe .5s cubic-bezier(0.16, 1, 0.3, 1) .85s backwards;
+  }
+  .abertura-logo{
+    width: clamp(76px, 13vh, 120px); height: clamp(76px, 13vh, 120px); flex-shrink:0;
+    border-radius:50%; background:#ffffff; border: 5px solid var(--dourado); object-fit:contain;
+  }
+  .abertura-texto{ flex:1; min-width:0; animation: aberturaLado .5s cubic-bezier(0.16, 1, 0.3, 1) 1.15s backwards; }
+  .abertura-escola{ font-size: clamp(10px, 1.3vw, 14px); color:#9CD3EE; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+  .abertura-titulo{ font-family: var(--fonte-titulo); font-size: clamp(20px, 3.6vw, 44px); color:#ffffff; line-height:1.05; margin: 3px 0; text-transform:uppercase; }
+  .abertura-titulo span{ color: var(--dourado); }
+  .abertura-sub{ font-size: clamp(13px, 1.8vw, 20px); color: var(--dourado); font-weight:800; text-transform:uppercase; letter-spacing:.5px; }
+  .abertura-btn{
+    flex-shrink:0; background: linear-gradient(135deg, #F5B940, #E89A1F); color: var(--quadra-escura);
+    border: 2px solid rgba(255,255,255,0.6); border-radius:999px; padding: 14px 34px; cursor:pointer;
+    font-family: var(--fonte-titulo); font-size: clamp(15px, 2vw, 22px); text-transform:uppercase;
+    box-shadow: 0 6px 0 #9c6c1c;
+    animation: aberturaPop .5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.4s backwards, aberturaPulsa 1.4s ease-in-out 2s infinite;
+  }
+  @keyframes aberturaCai{ from{ transform: translateY(-105%); } }
+  @keyframes aberturaSobe{ from{ transform: translateY(105%); } }
+  @keyframes aberturaEsq{ from{ transform: translateX(-105%); } }
+  @keyframes aberturaDir{ from{ transform: translateX(105%); } }
+  @keyframes aberturaLado{ from{ opacity:0; transform: translateX(-40px); } }
+  @keyframes aberturaPop{ from{ opacity:0; transform: scale(.2); } }
+  @keyframes aberturaQuica{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+  @keyframes aberturaPulsa{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.07); } }
+
+  /* saída: as faixas se abrem como cortina e a faixa do título desce */
+  .abertura.saindo{ background:transparent; pointer-events:none; transition: background .3s ease; }
+  .abertura.saindo .abertura-cor{ transition: transform .55s cubic-bezier(0.4, 0, 1, 1); transform: var(--saida); }
+  .abertura.saindo .abertura-banda{ transition: transform .45s cubic-bezier(0.4, 0, 1, 1); transform: translateY(110%); }
+
+  /* celular em pé: faixas horizontais empilhadas */
+  @media (orientation: portrait){
+    /* as faixas ocupam o espaço que sobra acima da faixa do título, seja qual for a altura dela */
+    .abertura{ display:flex; flex-direction:column; }
+    .abertura-faixas{ position:relative; flex:1; min-height:0; inset:auto; margin: -5vh 0 -3vh; flex-direction:column; }
+    .abertura-banda{ position:relative; z-index:1; }
+    .abertura-col{ transform: skewY(-5deg); margin: -1px 0; }
+    .abertura-col:first-child .abertura-conteudo, .abertura-col:last-child .abertura-conteudo{ transform: skewY(5deg); }
+    .abertura-col:first-child .abertura-cor{ padding-top: 4vh; }
+    .abertura-cor{
+      padding: 0 9vw; align-items:center; justify-content:flex-start;
+      border-left:none; border-top: 3px solid rgba(244,239,225,0.35);
+      animation-name: aberturaEsq; --saida: translateX(-110%) !important;
+    }
+    .abertura-col:nth-child(even) .abertura-cor{
+      animation-name: aberturaDir; justify-content:flex-end; --saida: translateX(110%) !important;
+    }
+    .abertura-conteudo{ transform: skewY(5deg); flex-direction:row; gap:16px; }
+    .abertura-col:nth-child(even) .abertura-conteudo{ flex-direction:row-reverse; }
+    .abertura-icone{ width: min(17vw, 9vh); }
+    .abertura-nome{ max-width:none; font-size: clamp(14px, 4.6vw, 24px); }
+    .abertura-banda{ flex-direction:column; text-align:center; gap:10px; padding: 16px; }
+  }
+
   /* ---------- Quem pediu menos movimento no aparelho ---------- */
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{
@@ -4220,6 +4308,52 @@
   }
 
   atualizarMedalhas();
+
+  /* ===================== TELA DE ABERTURA ===================== */
+  (function criarAbertura(){
+    // uma faixa por categoria, com um esporte que a representa
+    const faixas = [
+      { chave: 'marca', nome: 'Marca', icone: ICONES.atletismo },
+      { chave: 'invasao', nome: 'Invasão', icone: ICONES.futebol },
+      { chave: 'precisao', nome: 'Precisão', icone: ICONES.tiro_arco },
+      { chave: 'combinatorio', nome: 'Técnico-Combinatório', icone: ICONES.ginastica },
+      { chave: 'rede', nome: 'Rede', icone: ICONES.voleibol }
+    ];
+    // na saída, as duas da esquerda vão para a esquerda, as duas da direita para a direita e a do meio sobe
+    const saidas = ['translateX(-320%)', 'translateX(-320%)', 'translateY(-105%)', 'translateX(320%)', 'translateX(320%)'];
+
+    const abertura = document.createElement('div');
+    abertura.className = 'abertura';
+    abertura.innerHTML = `
+      <div class="abertura-faixas">
+        ${faixas.map((f, i) => `
+          <div class="abertura-col">
+            <div class="abertura-cor" style="--i:${i}; --saida:${saidas[i]}; background: linear-gradient(160deg, var(--cor-${f.chave}), var(--cor-${f.chave}-esc));">
+              <div class="abertura-conteudo">
+                <div class="abertura-icone">${f.icone}</div>
+                <div class="abertura-nome">${f.nome}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="abertura-banda">
+        <img class="abertura-logo" src="logo-prof-bruno.png" alt="Jogos E.F. - Prof. Bruno Dias">
+        <div class="abertura-texto">
+          <div class="abertura-escola">E.E.E.F.M. Ilda Ferreira da Fonseca Martins</div>
+          <div class="abertura-titulo">Jogos de <span>Educação Física</span></div>
+          <div class="abertura-sub">Classificação dos Esportes</div>
+        </div>
+        <button class="abertura-btn" id="btn-abertura-comecar">Começar</button>
+      </div>`;
+    document.body.appendChild(abertura);
+
+    document.getElementById('btn-abertura-comecar').addEventListener('click', () => {
+      // o toque libera o som: acorde de entrada
+      [392.00, 523.25, 659.25, 783.99].forEach((freq, i) => tocarNota(freq, 0.35, 'triangle', 0.14, i * 0.07));
+      abertura.classList.add('saindo');
+      setTimeout(() => { abertura.remove(); inputNome.focus(); }, 650);
+    });
+  })();
 
 })();
 
