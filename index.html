@@ -855,7 +855,14 @@
   }
   .carta.encontrada, .carta.classificada{ animation: pulsoAcerto .5s ease; }
   @keyframes pulsoAcerto{ 0%{ transform: scale(1); } 40%{ transform: scale(1.13) rotate(-2deg); } 100%{ transform: scale(1); } }
-  .carta.classificada .frente{ border: 3px solid var(--cor-categoria, #4caf50); }
+  /* carta acertada: mesmo visual do botão da categoria (mesma cor em degradê, texto e desenho claros) */
+  .carta.classificada .frente{
+    background: linear-gradient(135deg, var(--cor-viva, #2fa84f), var(--cor-categoria, #1a6b30));
+    border: 2px solid rgba(244,239,225,0.35);
+    color: var(--giz);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .carta.classificada .frente .icone svg{ filter: brightness(0) invert(1); opacity:.95; }
   .btn-categoria.pulso{ animation: pulsoAcerto .45s ease; }
 
   /* ---------- Quiz e perguntas da Corrida ---------- */
@@ -2567,6 +2574,8 @@
         tocarSomAcerto();
         // a carta fica com a cor da categoria e o botão dá um pulso
         classSelecionada.style.setProperty('--cor-categoria', CATEGORY_INFO[chaveCategoria].corHex);
+        // degradê igual ao do botão: da cor viva (--cor-marca, --cor-rede...) para a cor escura
+        classSelecionada.style.setProperty('--cor-viva', `var(--cor-${chaveCategoria})`);
         btn.classList.remove('pulso');
         void btn.offsetWidth;
         btn.classList.add('pulso');
@@ -4142,7 +4151,7 @@
     3: 'Hat-trick! ⚽⚽⚽',
     5: 'Cinco seguidas! Que craque! 🌟',
     8: 'Oito seguidas! Imparável! 🚀',
-    12: 'Doze seguidas! Nível seleção! 🇧🇷'
+    12: 'Doze seguidas! Nível seleção! 💚💛'
   };
   const FRASES_VITORIA = ['Golaço! 🥅', 'Show de bola! ⚽', 'Isso é que é campeão! 🏆', 'Mandou muito bem! 👏'];
   let sequenciaAcertos = 0;
