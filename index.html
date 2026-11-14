@@ -1020,11 +1020,15 @@
   .abertura-col:first-child .abertura-conteudo{ transform: skewX(10deg) translateX(4vw); }
   .abertura-col:last-child .abertura-conteudo{ transform: skewX(10deg) translateX(-4vw); }
   .abertura-icone{
-    width: min(11vw, 22vh, 130px);
+    width: min(13vw, 26vh, 160px); flex-shrink:0;
     animation: aberturaPop .5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards, aberturaQuica 1.6s ease-in-out infinite;
     animation-delay: calc(.45s + var(--i) * .12s), calc(1.6s + var(--i) * .2s);
   }
-  .abertura-icone svg{ width:100%; height:auto; display:block; filter: brightness(0) invert(1); }
+  .abertura-icone svg{ width:100%; height:auto; display:block; }
+  .abertura-frase{
+    display:block; margin-top:5px; font-family: var(--fonte-corpo); font-weight:700; text-transform:none;
+    letter-spacing:0; font-size: clamp(10px, 1.15vw, 15px); opacity:.92;
+  }
   .abertura-nome{
     font-family: var(--fonte-titulo); font-size: clamp(10px, 1.5vw, 19px); text-transform:uppercase;
     text-align:center; line-height:1.15; letter-spacing:.5px; max-width:16vw;
@@ -1072,23 +1076,24 @@
   @media (orientation: portrait){
     /* as faixas ocupam o espaço que sobra acima da faixa do título, seja qual for a altura dela */
     .abertura{ display:flex; flex-direction:column; }
-    .abertura-faixas{ position:relative; flex:1; min-height:0; inset:auto; margin: -5vh 0 -3vh; flex-direction:column; }
+    .abertura-faixas{ position:relative; flex:1; min-height:0; inset:auto; margin:0; flex-direction:column; }
     .abertura-banda{ position:relative; z-index:1; }
-    .abertura-col{ transform: skewY(-5deg); margin: -1px 0; }
-    .abertura-col:first-child .abertura-conteudo, .abertura-col:last-child .abertura-conteudo{ transform: skewY(5deg); }
-    .abertura-col:first-child .abertura-cor{ padding-top: 4vh; }
+    /* no celular as faixas são retas, sem inclinação */
+    .abertura-col{ transform:none; margin:0; min-height:0; }
     .abertura-cor{
-      padding: 0 9vw; align-items:center; justify-content:flex-start;
-      border-left:none; border-top: 3px solid rgba(244,239,225,0.35);
+      padding: 0 6vw; align-items:center; justify-content:flex-start;
+      border-left:none; border-bottom: 2px solid rgba(244,239,225,0.3);
       animation-name: aberturaEsq; --saida: translateX(-110%) !important;
     }
-    .abertura-col:nth-child(even) .abertura-cor{
-      animation-name: aberturaDir; justify-content:flex-end; --saida: translateX(110%) !important;
-    }
-    .abertura-conteudo{ transform: skewY(5deg); flex-direction:row; gap:16px; }
+    .abertura-col:nth-child(even) .abertura-cor{ animation-name: aberturaDir; --saida: translateX(110%) !important; }
+    .abertura-conteudo,
+    .abertura-col:first-child .abertura-conteudo,
+    .abertura-col:last-child .abertura-conteudo{ transform:none; flex-direction:row; gap:16px; width:100%; }
     .abertura-col:nth-child(even) .abertura-conteudo{ flex-direction:row-reverse; }
-    .abertura-icone{ width: min(17vw, 9vh); }
-    .abertura-nome{ max-width:none; font-size: clamp(14px, 4.6vw, 24px); }
+    .abertura-icone{ width: min(21vw, 11vh); }
+    .abertura-nome{ max-width:none; flex:1; text-align:left; font-size: clamp(15px, 5vw, 26px); }
+    .abertura-col:nth-child(even) .abertura-nome{ text-align:right; }
+    .abertura-frase{ font-size: clamp(11px, 3.2vw, 15px); }
     .abertura-banda{ flex-direction:column; text-align:center; gap:10px; padding: 16px; }
   }
 
@@ -4311,13 +4316,119 @@
 
   /* ===================== TELA DE ABERTURA ===================== */
   (function criarAbertura(){
-    // uma faixa por categoria, com um esporte que a representa
+    // ---- Desenhos da abertura: um equipamento detalhado por categoria (SVG, sem arquivos externos) ----
+    const SOMBRA_CHAO = '<ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".25"/>';
+
+    // Marca: cronômetro
+    function desenhoCronometro(){
+      let marcas = '';
+      for(let i = 0; i < 12; i++){
+        marcas += `<line x1="60" y1="31" x2="60" y2="${i % 3 ? 35 : 38}" transform="rotate(${i * 30} 60 64)"/>`;
+      }
+      return `<svg viewBox="0 0 120 120"><defs>
+        <linearGradient id="abMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6f8fa"/><stop offset=".5" stop-color="#9aa5ae"/><stop offset="1" stop-color="#55616a"/></linearGradient>
+        <radialGradient id="abVisor" cx=".35" cy=".3"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d5dbe0"/></radialGradient></defs>
+        ${SOMBRA_CHAO}
+        <rect x="53" y="9" width="14" height="13" rx="3" fill="url(#abMetal)"/><rect x="48" y="4" width="24" height="8" rx="4" fill="#39434b"/>
+        <rect x="85" y="19" width="10" height="13" rx="3" transform="rotate(42 90 25)" fill="url(#abMetal)"/>
+        <circle cx="60" cy="64" r="44" fill="url(#abMetal)"/><circle cx="60" cy="64" r="37" fill="url(#abVisor)" stroke="#39434b" stroke-width="1.5"/>
+        <g stroke="#27323a" stroke-width="2.4" stroke-linecap="round">${marcas}</g>
+        <line x1="60" y1="64" x2="60" y2="46" stroke="#27323a" stroke-width="3.6" stroke-linecap="round" transform="rotate(-65 60 64)"/>
+        <line x1="60" y1="70" x2="60" y2="33" stroke="#d62d2d" stroke-width="2.6" stroke-linecap="round" transform="rotate(48 60 64)"/>
+        <circle cx="60" cy="64" r="4.5" fill="#27323a"/>
+        <path d="M29 52 A33 33 0 0 1 58 31" stroke="#fff" stroke-width="4" opacity=".7" fill="none" stroke-linecap="round"/></svg>`;
+    }
+
+    // Invasão: bola de futebol (pentágono central, cinco nas bordas e as costuras entre eles)
+    function desenhoBolaFutebol(){
+      const cx = 60, cy = 60, rad = Math.PI / 180;
+      const ponto = (ang, r, ox, oy) => [(ox + r * Math.cos(ang * rad)).toFixed(1), (oy + r * Math.sin(ang * rad)).toFixed(1)];
+      let gomos = '', costuras = '';
+      const centro = [];
+      for(let j = 0; j < 5; j++) centro.push(ponto(-90 + 72 * j, 15, cx, cy).join(','));
+      gomos += `<polygon points="${centro.join(' ')}"/>`;
+      for(let k = 0; k < 5; k++){
+        const ang = -90 + 72 * k;
+        const ox = cx + 41 * Math.cos(ang * rad), oy = cy + 41 * Math.sin(ang * rad);
+        const v = [];
+        for(let m = 0; m < 5; m++) v.push(ponto(ang + 180 + 72 * m, 14, ox, oy));
+        gomos += `<polygon points="${v.map(p => p.join(',')).join(' ')}"/>`;
+        const a = ponto(ang, 15, cx, cy);
+        costuras += `<line x1="${a[0]}" y1="${a[1]}" x2="${v[0][0]}" y2="${v[0][1]}"/>`;
+        const ang2 = ang + 72;
+        const ox2 = cx + 41 * Math.cos(ang2 * rad), oy2 = cy + 41 * Math.sin(ang2 * rad);
+        const b = ponto(ang2 + 180 + 288, 14, ox2, oy2);
+        costuras += `<line x1="${v[1][0]}" y1="${v[1][1]}" x2="${b[0]}" y2="${b[1]}"/>`;
+      }
+      return `<svg viewBox="0 0 120 120"><defs>
+        <radialGradient id="abBola" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e9edf0"/><stop offset="1" stop-color="#9aa5ae"/></radialGradient>
+        <radialGradient id="abBolaSombra" cx=".36" cy=".3" r=".8"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></radialGradient>
+        <clipPath id="abBolaClip"><circle cx="60" cy="60" r="44"/></clipPath></defs>
+        ${SOMBRA_CHAO}
+        <circle cx="60" cy="60" r="44" fill="url(#abBola)"/>
+        <g clip-path="url(#abBolaClip)">
+          <g fill="#1d262d" stroke="#1d262d" stroke-width="1.5" stroke-linejoin="round">${gomos}</g>
+          <g stroke="#1d262d" stroke-width="2" stroke-linecap="round">${costuras}</g>
+        </g>
+        <circle cx="60" cy="60" r="44" fill="url(#abBolaSombra)"/><circle cx="60" cy="60" r="44" fill="none" stroke="#1d262d" stroke-width="1.5"/></svg>`;
+    }
+
+    // Precisão: alvo com a flecha cravada no centro
+    function desenhoAlvo(){
+      return `<svg viewBox="0 0 120 120"><defs><clipPath id="abAlvoClip"><circle cx="54" cy="62" r="44"/></clipPath></defs>
+        <ellipse cx="54" cy="113" rx="34" ry="5" fill="#000" opacity=".25"/>
+        <path d="M34 98 L26 116 M74 98 L82 116" stroke="#7a4a1e" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="54" cy="62" r="44" fill="#fbfbf7" stroke="#27323a" stroke-width="1.5"/><circle cx="54" cy="62" r="35.5" fill="#27323a"/>
+        <circle cx="54" cy="62" r="27" fill="#2f8fd1"/><circle cx="54" cy="62" r="18.5" fill="#d62d2d"/>
+        <circle cx="54" cy="62" r="10" fill="#f5c21b"/><circle cx="54" cy="62" r="2.5" fill="#27323a"/>
+        <g clip-path="url(#abAlvoClip)"><line x1="58" y1="66" x2="100" y2="26" stroke="#000" stroke-width="4" opacity=".25" stroke-linecap="round"/></g>
+        <line x1="55" y1="61" x2="104" y2="14" stroke="#8a5a2b" stroke-width="3.6" stroke-linecap="round"/>
+        <line x1="55" y1="61" x2="62" y2="54.3" stroke="#c9ced3" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M92 25.5 L98 9 L108 10 L104 14 Z" fill="#e5484d"/><path d="M92 25.5 L109 21 L110 11 L104 14 Z" fill="#f4efe1"/>
+        <path d="M92 25.5 L104 14" stroke="#7a4a1e" stroke-width="1.5"/></svg>`;
+    }
+
+    // Técnico-combinatório: skate e as placas com as notas dos juízes
+    function desenhoSkateNotas(){
+      const placa = (x, giro, nota) => `<g transform="rotate(${giro} ${x + 13} 30)">
+        <line x1="${x + 13}" y1="40" x2="${x + 13}" y2="56" stroke="#7a4a1e" stroke-width="3" stroke-linecap="round"/>
+        <rect x="${x}" y="10" width="26" height="32" rx="4" fill="#fbfbf7" stroke="#27323a" stroke-width="1.5"/>
+        <text x="${x + 13}" y="32" font-size="13" font-weight="700" text-anchor="middle" fill="#27323a" font-family="Arial, sans-serif">${nota}</text></g>`;
+      return `<svg viewBox="0 0 120 120">${SOMBRA_CHAO}${placa(14, -9, '9.8')}${placa(47, 0, '10')}${placa(80, 9, '9.9')}
+        <g transform="rotate(-8 60 86)">
+          <rect x="29" y="84" width="12" height="9" rx="2" fill="#9aa5ae"/><rect x="79" y="84" width="12" height="9" rx="2" fill="#9aa5ae"/>
+          <path d="M10 70 Q17 82 31 82 L89 82 Q103 82 110 70" fill="none" stroke="#e5484d" stroke-width="8" stroke-linecap="round"/>
+          <path d="M10 68 Q17 80 31 80 L89 80 Q103 80 110 68" fill="none" stroke="#1d262d" stroke-width="5" stroke-linecap="round"/>
+          <g fill="#f4efe1" stroke="#b9a777" stroke-width="2"><circle cx="35" cy="97" r="8.5"/><circle cx="85" cy="97" r="8.5"/></g>
+          <circle cx="35" cy="97" r="2.6" fill="#55616a"/><circle cx="85" cy="97" r="2.6" fill="#55616a"/>
+        </g></svg>`;
+    }
+
+    // Rede: bola de vôlei passando por cima da rede
+    function desenhoVolei(){
+      let malha = '';
+      for(let x = 4; x < 120; x += 10) malha += `<line x1="${x}" y1="86" x2="${x}" y2="120"/>`;
+      for(let y = 96; y < 120; y += 10) malha += `<line x1="0" y1="${y}" x2="120" y2="${y}"/>`;
+      return `<svg viewBox="0 0 120 120"><defs>
+        <radialGradient id="abVoleiSombra" cx=".36" cy=".3" r=".8"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient>
+        <clipPath id="abVoleiClip"><circle cx="62" cy="42" r="34"/></clipPath></defs>
+        <g stroke="#f4efe1" stroke-width="1.4" opacity=".9">${malha}</g><rect x="0" y="81" width="120" height="7" fill="#fbfbf7"/>
+        <circle cx="62" cy="42" r="34" fill="#fbf8ea"/>
+        <g clip-path="url(#abVoleiClip)">
+          <path d="M26 44 C34 16 66 2 92 18 C70 16 50 30 42 62 Z" fill="#2f6fed"/>
+          <path d="M60 78 C54 56 68 34 98 36 C82 42 74 58 78 74 Z" fill="#f5c21b"/>
+          <path d="M28 28 C44 30 58 20 64 8 M30 60 C50 46 78 50 96 58 M60 78 C56 58 68 42 98 40 M42 62 C48 38 66 24 92 22" fill="none" stroke="#27323a" stroke-width="1.6"/>
+        </g>
+        <circle cx="62" cy="42" r="34" fill="url(#abVoleiSombra)"/><circle cx="62" cy="42" r="34" fill="none" stroke="#27323a" stroke-width="1.5"/></svg>`;
+    }
+
+    // uma faixa por categoria: desenho, nome e uma frase curta com a ideia central
     const faixas = [
-      { chave: 'marca', nome: 'Marca', icone: ICONES.atletismo },
-      { chave: 'invasao', nome: 'Invasão', icone: ICONES.futebol },
-      { chave: 'precisao', nome: 'Precisão', icone: ICONES.tiro_arco },
-      { chave: 'combinatorio', nome: 'Técnico-Combinatório', icone: ICONES.ginastica },
-      { chave: 'rede', nome: 'Rede', icone: ICONES.voleibol }
+      { chave: 'marca', nome: 'Marca', frase: 'O cronômetro decide', icone: desenhoCronometro() },
+      { chave: 'invasao', nome: 'Invasão', frase: 'Entrar no campo rival', icone: desenhoBolaFutebol() },
+      { chave: 'precisao', nome: 'Precisão', frase: 'Acertar o alvo', icone: desenhoAlvo() },
+      { chave: 'combinatorio', nome: 'Técnico-Combinatório', frase: 'A nota dos juízes', icone: desenhoSkateNotas() },
+      { chave: 'rede', nome: 'Rede', frase: 'A bola não pode cair', icone: desenhoVolei() }
     ];
     // na saída, as duas da esquerda vão para a esquerda, as duas da direita para a direita e a do meio sobe
     const saidas = ['translateX(-320%)', 'translateX(-320%)', 'translateY(-105%)', 'translateX(320%)', 'translateX(320%)'];
@@ -4331,7 +4442,7 @@
             <div class="abertura-cor" style="--i:${i}; --saida:${saidas[i]}; background: linear-gradient(160deg, var(--cor-${f.chave}), var(--cor-${f.chave}-esc));">
               <div class="abertura-conteudo">
                 <div class="abertura-icone">${f.icone}</div>
-                <div class="abertura-nome">${f.nome}</div>
+                <div class="abertura-nome">${f.nome}<span class="abertura-frase">${f.frase}</span></div>
               </div>
             </div>
           </div>`).join('')}
