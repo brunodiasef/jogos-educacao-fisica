@@ -580,11 +580,19 @@
   .turno-corrida.vez-computador{ background: rgba(255,255,255,0.6); border-color:#17408f; color:#17408f; }
 
   .pista-corrida{
-    position:relative; width:100%; max-width: 640px; aspect-ratio: 2/1.05;
-    background: #c0392b;
-    border-radius: 999px; overflow:hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    position:relative; width:100%; max-width: 680px; aspect-ratio: 680/430;
+    background: #0d2a3b;
+    border-radius: 16px; overflow:hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     border: 3px solid rgba(244,239,225,0.25);
   }
+  /* o estádio (arquibancada, pista com as 30 casas pintadas, gramado) é um único desenho em SVG */
+  .pista-svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .pista-numero{ font-family: Arial, sans-serif; font-weight:700; text-anchor:middle; fill:#ffffff; paint-order:stroke; stroke: rgba(0,0,0,0.35); stroke-width:3px; }
+  .pista-interrogacao{
+    font-family: Arial, sans-serif; font-weight:700; text-anchor:middle; fill: var(--quadra-escura);
+    transform-box: fill-box; transform-origin:center; animation: pulsarInterrogacao 1.5s ease-in-out infinite;
+  }
+  @keyframes pulsarInterrogacao{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.22); } }
   .arquibancada-corrida{
     position:absolute; inset:0;
     background: repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 2%, transparent 2% 4%);
@@ -617,9 +625,9 @@
   }
 
   .peao-corrida{
-    position:absolute; width: 9%; aspect-ratio: 1/1; transform: translate(-50%, -50%);
+    position:absolute; width: 6.2%; aspect-ratio: 1/1; transform: translate(-50%, -50%);
     display:flex; align-items:center; justify-content:center;
-    font-size: clamp(15px, 3.4vw, 24px);
+    font-size: clamp(10px, 2.6vw, 19px);
     transition: left 0.35s ease, top 0.35s ease; z-index: 6;
     border-radius: 50%; box-sizing: border-box;
   }
@@ -1509,9 +1517,7 @@
         <span><span class="bolinha-legenda computador"></span>Computador</span>
       </div>
       <div class="pista-corrida" id="pista-corrida">
-        <div class="arquibancada-corrida"></div>
-        <div class="faixa-pista-externa"></div>
-        <div class="grama-central">🏟️</div>
+        <svg class="pista-svg" id="pista-svg" viewBox="0 0 680 430" aria-hidden="true"></svg>
         <div class="peao-corrida peao-jogador" id="peao-corrida">🏃</div>
         <div class="peao-corrida peao-computador" id="peao-computador">🤖</div>
       </div>
@@ -3479,13 +3485,27 @@
   });
 
   // Posiciona as 30 casas ao redor de uma pista oval (elipse), começando no topo (largada/chegada)
-  function posicaoPercentualCasa(indice){
-    const angulo = (indice / TOTAL_CASAS_CORRIDA) * Math.PI * 2 - Math.PI / 2;
-    const raioX = 38, raioY = 33;
-    return {
-      left: 50 + raioX * Math.cos(angulo),
-      top: 50 + raioY * Math.sin(angulo)
-    };
+  // A pista é desenhada num quadro de 680 x 430: duas retas de 300 e duas curvas de raio 120.
+  // A linha do meio da pista é dividida em 30 trechos iguais; cada trecho é uma casa.
+  const PISTA = { largura: 680, altura: 430, raio: 120, xEsq: 190, xDir: 490, yCentro: 215, reta: 300 };
+  const PISTA_CAMINHO = 'M340 95 H490 A120 120 0 0 1 490 335 H190 A120 120 0 0 1 190 95 H340';
+
+  // Centro da casa (índice 0 a 29) no quadro da pista, com a direção "para fora" da pista (nx, ny)
+  function posicaoCasaPista(indice){
+    const arco = Math.PI * PISTA.raio;
+    const total = 2 * PISTA.reta + 2 * arco;
+    let s = (150 + (indice + 0.5) * (total / TOTAL_CASAS_CORRIDA)) % total; // a largada fica no meio da reta de cima
+    if(s < PISTA.reta) return { x: PISTA.xEsq + s, y: PISTA.yCentro - PISTA.raio, nx: 0, ny: -1 };
+    s -= PISTA.reta;
+    if(s < arco){
+      const a = -Math.PI / 2 + s / PISTA.raio;
+      return { x: PISTA.xDir + PISTA.raio * Math.cos(a), y: PISTA.yCentro + PISTA.raio * Math.sin(a), nx: Math.cos(a), ny: Math.sin(a) };
+    }
+    s -= arco;
+    if(s < PISTA.reta) return { x: PISTA.xDir - s, y: PISTA.yCentro + PISTA.raio, nx: 0, ny: 1 };
+    s -= PISTA.reta;
+    const b = Math.PI / 2 + s / PISTA.raio;
+    return { x: PISTA.xEsq + PISTA.raio * Math.cos(b), y: PISTA.yCentro + PISTA.raio * Math.sin(b), nx: Math.cos(b), ny: Math.sin(b) };
   }
 
   function sortearCasasPergunta(){
@@ -3499,19 +3519,50 @@
   }
 
   function renderizarPista(){
-    pistaCorridaEl.querySelectorAll('.casa-pista').forEach(el => el.remove());
+    // cada casa é um trecho do piso: dois tons de tartan alternados, largada verde,
+    // perguntas em dourado e chegada quadriculada
+    let trechos = '', numeros = '';
     for(let casa = 1; casa <= TOTAL_CASAS_CORRIDA; casa++){
-      const pos = posicaoPercentualCasa(casa - 1);
-      const div = document.createElement('div');
-      div.className = 'casa-pista';
-      if(casa === 1) div.classList.add('largada');
-      if(casa === TOTAL_CASAS_CORRIDA) div.classList.add('chegada');
-      if(corridaCasasPergunta.has(casa)) div.classList.add('pergunta');
-      div.style.left = pos.left + '%';
-      div.style.top = pos.top + '%';
-      div.innerHTML = `<span>${casa}</span>`;
-      pistaCorridaEl.appendChild(div);
+      const ehPergunta = corridaCasasPergunta.has(casa);
+      let cor = casa % 2 ? '#cc5a3c' : '#b8472f';
+      if(ehPergunta) cor = '#e3a52c';
+      if(casa === 1) cor = '#35a153';
+      if(casa === TOTAL_CASAS_CORRIDA) cor = 'url(#pistaXadrez)';
+      trechos += `<path pathLength="30" d="${PISTA_CAMINHO}" stroke="${cor}" stroke-dasharray="1 29" stroke-dashoffset="${-(casa - 1)}"/>`;
+
+      const p = posicaoCasaPista(casa - 1);
+      // casa de pergunta: só a interrogação pintada no piso, sem placa nem fundo por cima
+      // a chegada não leva número: o quadriculado já diz o que ela é
+      if(casa === TOTAL_CASAS_CORRIDA) continue;
+      numeros += ehPergunta
+        ? `<text class="pista-interrogacao" x="${p.x.toFixed(1)}" y="${(p.y + 8).toFixed(1)}" font-size="24">?</text>`
+        : `<text class="pista-numero" x="${p.x.toFixed(1)}" y="${(p.y + 5).toFixed(1)}" font-size="14">${casa}</text>`;
     }
+
+    document.getElementById('pista-svg').innerHTML = `
+      <defs>
+        <pattern id="pistaGrama" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="20" height="40" fill="#2d8a4a"/><rect x="20" width="20" height="40" fill="#34a057"/></pattern>
+        <pattern id="pistaXadrez" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff"/><rect width="6" height="6" fill="#111"/><rect x="6" y="6" width="6" height="6" fill="#111"/></pattern>
+      </defs>
+      <g fill="none">
+        <path pathLength="60" d="M340 12 H490 A203 203 0 0 1 490 418 H190 A203 203 0 0 1 190 12 H340" stroke="#1c4a66" stroke-width="18" stroke-dasharray="1.8 0.2"/>
+        <path pathLength="60" d="M340 32 H490 A183 183 0 0 1 490 398 H190 A183 183 0 0 1 190 32 H340" stroke="#27607f" stroke-width="18" stroke-dasharray="1.8 0.2"/>
+        <path d="M340 49 H490 A166 166 0 0 1 490 381 H190 A166 166 0 0 1 190 49 H340" stroke="#e9edf0" stroke-width="5"/>
+      </g>
+      <g fill="none" stroke-width="80">${trechos}</g>
+      <path pathLength="30" d="${PISTA_CAMINHO}" fill="none" stroke="#fff" stroke-width="80" stroke-dasharray="0.05 0.95" stroke-dashoffset="0.025" opacity=".9"/>
+      <g fill="none" stroke="#fff" stroke-width="2">
+        <path d="M190 55 H490 A160 160 0 0 1 490 375 H190 A160 160 0 0 1 190 55 Z"/>
+        <path d="M190 135 H490 A80 80 0 0 1 490 295 H190 A80 80 0 0 1 190 135 Z"/>
+        <path d="M190 81.5 H490 A133.5 133.5 0 0 1 490 348.5 H190 A133.5 133.5 0 0 1 190 81.5 Z" opacity=".7" stroke-width="1.3"/>
+        <path d="M190 108.5 H490 A106.5 106.5 0 0 1 490 321.5 H190 A106.5 106.5 0 0 1 190 108.5 Z" opacity=".7" stroke-width="1.3"/>
+      </g>
+      <path d="M190 137 H490 A78 78 0 0 1 490 293 H190 A78 78 0 0 1 190 137 Z" fill="url(#pistaGrama)"/>
+      <g fill="none" stroke="#fff" stroke-width="2" opacity=".6">
+        <rect x="156" y="150" width="368" height="130" rx="2"/><line x1="340" y1="150" x2="340" y2="280"/><circle cx="340" cy="215" r="32"/>
+        <rect x="156" y="183" width="42" height="64"/><rect x="482" y="183" width="42" height="64"/>
+      </g>
+      ${numeros}`;
     atualizarPosicaoToken('jogador');
     atualizarPosicaoToken('computador');
   }
@@ -3524,22 +3575,22 @@
         getCasa: () => jogadorCasa,
         setCasa: (v) => { jogadorCasa = v; },
         elemento: peaoCorridaEl,
-        offsetX: -2.5, offsetY: -2.5
+        desvio: -26 // o aluno corre pela raia de dentro
       };
     }
     return {
       getCasa: () => computadorCasa,
       setCasa: (v) => { computadorCasa = v; },
       elemento: peaoComputadorEl,
-      offsetX: 2.5, offsetY: 2.5
+      desvio: 26 // o computador corre pela raia de fora
     };
   }
 
   function atualizarPosicaoToken(id){
     const est = estadoTurno(id);
-    const pos = posicaoPercentualCasa(est.getCasa() - 1);
-    est.elemento.style.left = (pos.left + est.offsetX) + '%';
-    est.elemento.style.top = (pos.top + est.offsetY) + '%';
+    const pos = posicaoCasaPista(est.getCasa() - 1);
+    est.elemento.style.left = ((pos.x + pos.nx * est.desvio) / PISTA.largura * 100) + '%';
+    est.elemento.style.top = ((pos.y + pos.ny * est.desvio) / PISTA.altura * 100) + '%';
   }
 
   function atualizarPainelCorrida(){
