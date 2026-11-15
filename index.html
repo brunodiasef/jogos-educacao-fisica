@@ -792,6 +792,28 @@
     to{ transform: translate3d(var(--desvio, 40px), -125vh, 0) rotate(var(--giro, 360deg)); }
   }
 
+  /* ---------- Celular: nenhuma tela pode ficar mais larga que o aparelho ---------- */
+  /* (o teclado da Forca pedia 12 colunas de largura mínima e empurrava a tela para fora) */
+  .app > section{ max-width:100%; min-width:0; }
+  .celula-cruzada input{ min-width:0; }
+  /* espaço no topo para os botões Menu e Música não ficarem em cima do nome da escola */
+  @media (max-width: 600px){
+    body{ padding-top: 62px; }
+    /* dentro dos jogos e do conteúdo o cabeçalho encolhe: só o título, pequeno, entre os botões Menu e Música */
+    body.cabecalho-compacto{ padding-top: 14px; }
+    body.cabecalho-compacto .escola,
+    body.cabecalho-compacto .faixa-conteudo{ display:none; }
+    body.cabecalho-compacto header.titulo{
+      min-height: 40px; max-width: calc(100% - 216px); margin: 0 auto 14px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    body.cabecalho-compacto header.titulo h1{ font-size: 13px; line-height:1.15; letter-spacing:.5px; text-shadow: 0 2px 3px rgba(18,59,82,0.45); }
+  }
+  /* em aparelhos sem a fonte Arial Black (iPhone), os títulos continuam em negrito forte */
+  .faixa-conteudo span.texto, .categoria-jogos-label, .cat-numero, .quiz-pergunta, .forca-palavra,
+  .enunciado-corrida, .lista-dicas h3, .sidebar-titulo, .painel-item b, .verso::after,
+  .abertura-titulo, .abertura-nome, .abertura-btn{ font-weight:900; }
+
   /* ---------- Entrada das telas e dos cartões ---------- */
   .app > section:not(.escondido){ animation: entrarTela .38s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
   @keyframes entrarTela{ from{ opacity:0; transform: translateY(18px); } }
@@ -2882,7 +2904,8 @@
   }
 
   function renderizarGradeCruzadas(){
-    gradeCruzadasEl.style.gridTemplateColumns = `repeat(${CRUZADAS_COLUNAS}, 1fr)`;
+    // minmax(0, 1fr): as colunas encolhem para caber na tela, mesmo com campos de digitação dentro
+    gradeCruzadasEl.style.gridTemplateColumns = `repeat(${CRUZADAS_COLUNAS}, minmax(0, 1fr))`;
     gradeCruzadasEl.innerHTML = '';
     for(let r = 0; r < CRUZADAS_LINHAS; r++){
       for(let c = 0; c < CRUZADAS_COLUNAS; c++){
@@ -3158,7 +3181,7 @@
   let cacaAtual = null;
 
   function renderizarGradeCaca(){
-    gradeCacaEl.style.gridTemplateColumns = `repeat(${CACA_TAMANHO}, 1fr)`;
+    gradeCacaEl.style.gridTemplateColumns = `repeat(${CACA_TAMANHO}, minmax(0, 1fr))`;
     gradeCacaEl.innerHTML = '';
     cacaCelulasEl = [];
     for(let r = 0; r < CACA_TAMANHO; r++){
@@ -4364,6 +4387,25 @@
   }
 
   atualizarMedalhas();
+
+  /* ===================== CABEÇALHO COMPACTO NOS JOGOS ===================== */
+  // Na identificação e no início o cabeçalho aparece inteiro; nas demais telas ele encolhe
+  // (no celular), para o jogo caber na tela sem precisar rolar tanto.
+  const TELAS_CABECALHO_INTEIRO = ['tela-nome', 'tela-hub'];
+  function atualizarCabecalho(){
+    const visivel = Array.from(document.querySelectorAll('.app > section')).find(s => !s.classList.contains('escondido'));
+    const compacto = !!visivel && !TELAS_CABECALHO_INTEIRO.includes(visivel.id);
+    if(document.body.classList.contains('cabecalho-compacto') !== compacto){
+      document.body.classList.toggle('cabecalho-compacto', compacto);
+      window.scrollTo(0, 0); // a tela nova começa do topo
+    }
+  }
+  new MutationObserver(mudancas => {
+    if(mudancas.some(m => m.target.tagName === 'SECTION' && m.target.parentElement && m.target.parentElement.classList.contains('app'))){
+      atualizarCabecalho();
+    }
+  }).observe(document.querySelector('.app'), { attributes: true, attributeFilter: ['class'], subtree: true });
+  atualizarCabecalho();
 
   /* ===================== TELA DE ABERTURA ===================== */
   (function criarAbertura(){
